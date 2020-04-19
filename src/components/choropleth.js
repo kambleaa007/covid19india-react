@@ -17,6 +17,7 @@ function ChoroplethMap({
   changeMap,
   selectedRegion,
   setSelectedRegion,
+  isCountryLoaded,
 }) {
   const choroplethMap = useRef(null);
   const choroplethLegend = useRef(null);
@@ -41,11 +42,11 @@ function ChoroplethMap({
       let height;
       if (!svg.attr('viewBox')) {
         const widthStyle = parseInt(svg.style('width'));
-        // Hack to fix height on state pages
-        if (mapMeta.mapType === MAP_TYPES.STATE) {
+        if (isCountryLoaded) projection.fitWidth(widthStyle, topology);
+        else {
           const heightStyle = parseInt(svg.style('height'));
           projection.fitSize([widthStyle, heightStyle], topology);
-        } else projection.fitWidth(widthStyle, topology);
+        }
         path = d3.geoPath(projection);
         const bBox = path.bounds(topology);
         width = +bBox[1][0];
@@ -59,20 +60,13 @@ function ChoroplethMap({
       path = d3.geoPath(projection);
 
       /* LEGEND */
-      const domainMax = Math.max(3, statistic.maxConfirmed);
-      const steps = Math.min(6, domainMax);
-      const domainMin = Math.max(2, Math.floor(statistic.maxConfirmed / steps));
-      const domain = Array.from(
-        {length: steps},
-        (e, i) => domainMin + i * Math.floor(domainMax / steps)
-      );
-
       const svgLegend = d3.select(choroplethLegend.current);
       svgLegend.selectAll('*').remove();
-      const colorScale = d3
-        .scaleThreshold()
-        .domain(domain)
-        .range(d3.schemeReds[steps]);
+      const redInterpolator = (t) => d3.interpolateReds(t * 0.85);
+      const colorScale = d3.scaleSequential(
+        [0, statistic.maxConfirmed],
+        redInterpolator
+      );
       // Colorbar
       const widthLegend = parseInt(svgLegend.style('width'));
       const margin = {left: 0.02 * widthLegend, right: 0.02 * widthLegend};
@@ -87,6 +81,12 @@ function ChoroplethMap({
             title: 'Confirmed Cases',
             width: barWidth,
             height: 0.8 * heightLegend,
+            ticks: 6,
+            tickFormat: function (d, i, n) {
+              if (!Number.isInteger(d)) return;
+              if (i === n.length - 1) return d + '+';
+              return d;
+            },
           })
         );
       svgLegend.attr('viewBox', `0 0 ${widthLegend} ${heightLegend}`);
@@ -111,7 +111,6 @@ function ChoroplethMap({
           handleMouseover(d.properties[propertyField]);
         })
         .on('mouseleave', (d) => {
-          setSelectedRegion(null);
           if (onceTouchedRegion === d) onceTouchedRegion = null;
         })
         .on('touchstart', (d) => {
@@ -159,6 +158,7 @@ function ChoroplethMap({
 
       // Reset on tapping outside map
       svg.on('click', () => {
+        setSelectedRegion(null);
         if (mapMeta.mapType === MAP_TYPES.COUNTRY)
           setHoveredRegion('Total', mapMeta);
       });
@@ -171,6 +171,7 @@ function ChoroplethMap({
       changeMap,
       setHoveredRegion,
       setSelectedRegion,
+      isCountryLoaded,
     ]
   );
 

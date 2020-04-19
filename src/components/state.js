@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {format, parse} from 'date-fns';
 import React, {useEffect, useRef, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import * as Icon from 'react-feather';
 
 import {
@@ -23,6 +23,8 @@ function State(props) {
   const mapRef = useRef();
   const tsRef = useRef();
 
+  const {stateCode} = useParams();
+
   const [fetched, setFetched] = useState(false);
   const [timeseries, setTimeseries] = useState({});
   const [graphOption, setGraphOption] = useState(1);
@@ -32,9 +34,6 @@ function State(props) {
   const [testData, setTestData] = useState({});
   const [sources, setSources] = useState({});
   const [districtData, setDistrictData] = useState({});
-  const [stateCode] = useState(
-    window.location.pathname.split('/').pop().toUpperCase()
-  );
   const [stateName] = useState(STATE_CODES[stateCode]);
 
   useEffect(() => {
@@ -139,6 +138,7 @@ function State(props) {
                   states={[stateData]}
                   stateDistrictWiseData={districtData}
                   stateTestData={testData}
+                  isCountryLoaded={false}
                 />
               }
             </React.Fragment>
@@ -159,18 +159,20 @@ function State(props) {
                 <Icon.Compass />
                 <div className="sources-right">
                   Data collected from sources{' '}
-                  {Object.keys(sources[0]).map((key) => {
-                    if (key.match('source') && sources[0][key] !== '') {
-                      const num = key.match(/\d+/);
-                      return (
-                        <React.Fragment>
-                          {num > 1 ? ',' : ''}
-                          <a href={sources[0][key]}>{num}</a>
-                        </React.Fragment>
-                      );
-                    }
-                    return null;
-                  })}
+                  {sources.length > 0
+                    ? Object.keys(sources[0]).map((key) => {
+                        if (key.match('source') && sources[0][key] !== '') {
+                          const num = key.match(/\d+/);
+                          return (
+                            <React.Fragment>
+                              {num > 1 ? ',' : ''}
+                              <a href={sources[0][key]}>{num}</a>
+                            </React.Fragment>
+                          );
+                        }
+                        return null;
+                      })
+                    : ''}
                 </div>
               </div>
             </div>
@@ -187,35 +189,40 @@ function State(props) {
                 >
                   <h2>Top districts</h2>
                   <div className="districts">
-                    {Object.keys(districtData[stateName].districtData)
-                      .slice(0, 6)
-                      .sort(
-                        (a, b) =>
-                          districtData[stateName].districtData[b].confirmed -
-                          districtData[stateName].districtData[a].confirmed
-                      )
-                      .map((district, index) => {
-                        return (
-                          <div key={index} className="district">
-                            <h2>
-                              {
-                                districtData[stateName].districtData[district]
-                                  .confirmed
-                              }
-                            </h2>
-                            <h5>{district}</h5>
-                            <div className="delta">
-                              <Icon.ArrowUp />
-                              <h6>
-                                {
-                                  districtData[stateName].districtData[district]
-                                    .delta.confirmed
-                                }
-                              </h6>
-                            </div>
-                          </div>
-                        );
-                      })}
+                    {districtData[stateName]
+                      ? Object.keys(districtData[stateName].districtData)
+                          .sort(
+                            (a, b) =>
+                              districtData[stateName].districtData[b]
+                                .confirmed -
+                              districtData[stateName].districtData[a].confirmed
+                          )
+                          .slice(0, 6)
+                          .map((district, index) => {
+                            return (
+                              <div key={index} className="district">
+                                <h2>
+                                  {
+                                    districtData[stateName].districtData[
+                                      district
+                                    ].confirmed
+                                  }
+                                </h2>
+                                <h5>{district}</h5>
+                                <div className="delta">
+                                  <Icon.ArrowUp />
+                                  <h6>
+                                    {
+                                      districtData[stateName].districtData[
+                                        district
+                                      ].delta.confirmed
+                                    }
+                                  </h6>
+                                </div>
+                              </div>
+                            );
+                          })
+                      : ''}
                   </div>
                 </div>
                 <div className="district-bar-right">
@@ -304,12 +311,14 @@ function State(props) {
             </React.Fragment>
           )}
         </div>
+
         <div className="state-left">
           <div className="Clusters fadeInUp" style={{animationDelay: '0.8s'}}>
-            <h1>Clusters</h1>
+            <h1>Network of transmission</h1>
             <Clusters stateCode={stateCode} />
           </div>
         </div>
+
         <div className="state-right"></div>
       </div>
       <Footer />

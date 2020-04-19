@@ -32,32 +32,69 @@ function Home(props) {
   const [timeseriesLogMode, setTimeseriesLogMode] = useState(false);
   const [regionHighlighted, setRegionHighlighted] = useState(undefined);
   const [showUpdates, setShowUpdates] = useState(false);
+  const [seenUpdates, setSeenUpdates] = useState(false);
+  const [newUpdate, setNewUpdate] = useState(true);
 
   useEffect(() => {
+    // this if block is for checking if user opened a page for first time.
+    if (localStorage.getItem('anyNewUpdate') === null) {
+      localStorage.setItem('anyNewUpdate', true);
+    } else {
+      setSeenUpdates(true);
+      setNewUpdate(localStorage.getItem('anyNewUpdate') === 'false');
+    }
     if (fetched === false) {
       getStates();
+      axios
+        .get('https://api.covid19india.org/updatelog/log.json')
+        .then((response) => {
+          const currentTimestamp = response.data
+            .slice()
+            .reverse()[0]
+            .timestamp.toString();
+          // Sets and Updates the data in the local storage.
+          if (localStorage.getItem('currentItem') !== null) {
+            if (localStorage.getItem('currentItem') !== currentTimestamp) {
+              localStorage.setItem('currentItem', currentTimestamp);
+              localStorage.setItem('anyNewUpdate', true);
+            }
+          } else {
+            localStorage.setItem('currentItem', currentTimestamp);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }, [fetched]);
 
   const getStates = async () => {
     try {
       const [
-        response,
+        {data},
         stateDistrictWiseResponse,
         {data: statesDailyResponse},
-        stateTestResponse,
+        {data: stateTestData},
       ] = await Promise.all([
         axios.get('https://api.covid19india.org/data.json'),
         axios.get('https://api.covid19india.org/state_district_wise.json'),
         axios.get('https://api.covid19india.org/states_daily.json'),
         axios.get('https://api.covid19india.org/state_test_data.json'),
       ]);
-      setStates(response.data.statewise);
+      setStates(data.statewise);
       const ts = parseStateTimeseries(statesDailyResponse);
-      ts['TT'] = preprocessTimeseries(response.data.cases_time_series); // TT -> India
+      ts['TT'] = preprocessTimeseries(data.cases_time_series); // TT -> India
       setTimeseries(ts);
-      setLastUpdated(response.data.statewise[0].lastupdatedtime);
-      setStateTestData(stateTestResponse.data.states_tested_data.reverse());
+      setLastUpdated(data.statewise[0].lastupdatedtime);
+      const testData = stateTestData.states_tested_data.reverse();
+      const totalTest = data.tested[data.tested.length - 1];
+      testData.push({
+        updatedon: totalTest.updatetimestamp.split(' ')[0],
+        totaltested: totalTest.totalindividualstested,
+        source: totalTest.source,
+        state: 'Total', // India
+      });
+      setStateTestData(testData);
       setStateDistrictWiseData(stateDistrictWiseResponse.data);
       setFetched(true);
     } catch (err) {
@@ -103,9 +140,22 @@ function Home(props) {
                   <Icon.Bell
                     onClick={() => {
                       setShowUpdates(!showUpdates);
+                      localStorage.setItem('anyNewUpdate', false);
+                      setSeenUpdates(true);
+                      setNewUpdate(
+                        localStorage.getItem('anyNewUpdate') === 'false'
+                      );
                     }}
                   />
-                  <div className="indicator"></div>
+                  {seenUpdates ? (
+                    !newUpdate ? (
+                      <div className="indicator"></div>
+                    ) : (
+                      ''
+                    )
+                  ) : (
+                    <div className="indicator"></div>
+                  )}
                 </div>
               )}
               {showUpdates && (
@@ -145,6 +195,7 @@ function Home(props) {
                 stateTestData={stateTestData}
                 regionHighlighted={regionHighlighted}
                 onMapHighlightChange={onMapHighlightChange}
+                isCountryLoaded={true}
               />
 
               <div
@@ -177,6 +228,7 @@ function Home(props) {
                   <div className="timeseries-mode">
                     <label htmlFor="timeseries-mode">Uniform</label>
                     <input
+                      id="timeseries-mode"
                       type="checkbox"
                       checked={timeseriesMode}
                       className="switch"
@@ -193,6 +245,7 @@ function Home(props) {
                   >
                     <label htmlFor="timeseries-logmode">Logarithmic</label>
                     <input
+                      id="timeseries-logmode"
                       type="checkbox"
                       checked={graphOption === 1 && timeseriesLogMode}
                       className="switch"
