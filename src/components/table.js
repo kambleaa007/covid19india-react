@@ -1,7 +1,11 @@
+import Row from './row';
+
 import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 
-import Row from './row';
+const isEqual = () => {
+  return true;
+};
 
 function Table(props) {
   const [states, setStates] = useState(props.states);
@@ -257,7 +261,7 @@ function Table(props) {
               if (index !== 0 && state.confirmed > 0) {
                 return (
                   <Row
-                    key={index}
+                    key={state.state}
                     index={index}
                     state={state}
                     total={false}
@@ -298,4 +302,4 @@ function Table(props) {
   }
 }
 
-export default Table;
+export default React.memo(Table, isEqual);
