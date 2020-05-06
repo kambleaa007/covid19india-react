@@ -7,17 +7,16 @@ import * as d3 from 'd3';
 import {addDays, subDays, format} from 'date-fns';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import * as Icon from 'react-feather';
+import {useTranslation} from 'react-i18next';
 
-function TimeSeries(props) {
+function TimeSeries({timeseriesProp, chartType, mode, logMode, isTotal}) {
+  const {t} = useTranslation();
   const [lastDaysCount, setLastDaysCount] = useState(
     window.innerWidth > 512 ? Infinity : 30
   );
-  const [timeseries, setTimeseries] = useState([]);
+  const [timeseries, setTimeseries] = useState({});
   const [datapoint, setDatapoint] = useState({});
   const [index, setIndex] = useState(0);
-  const [mode, setMode] = useState(props.mode);
-  const [logMode, setLogMode] = useState(props.logMode);
-  const [chartType, setChartType] = useState(props.type);
   const [moving, setMoving] = useState(false);
 
   const svgRef1 = useRef();
@@ -44,20 +43,8 @@ function TimeSeries(props) {
   );
 
   useEffect(() => {
-    transformTimeSeries(props.timeseries);
-  }, [lastDaysCount, transformTimeSeries, props.timeseries]);
-
-  useEffect(() => {
-    setMode(props.mode);
-  }, [props.mode]);
-
-  useEffect(() => {
-    setLogMode(props.logMode);
-  }, [props.logMode]);
-
-  useEffect(() => {
-    setChartType(props.type);
-  }, [props.type]);
+    transformTimeSeries(timeseriesProp);
+  }, [lastDaysCount, timeseriesProp, transformTimeSeries]);
 
   const graphData = useCallback(
     (timeseries) => {
@@ -400,7 +387,7 @@ function TimeSeries(props) {
           .on('touchend', mouseout);
       });
     },
-    [dimensions, chartType, logMode, mode]
+    [chartType, dimensions, logMode, mode]
   );
 
   useEffect(() => {
@@ -432,7 +419,7 @@ function TimeSeries(props) {
       <div className="TimeSeries fadeInUp" style={{animationDelay: '2.7s'}}>
         <div className="svg-parent" ref={wrapperRef}>
           <div className="stats">
-            <h5 className={`${!moving ? 'title' : ''}`}>Confirmed</h5>
+            <h5 className={`${!moving ? 'title' : ''}`}>{t('Confirmed')}</h5>
             <h5 className={`${moving ? 'title' : ''}`}>{`${dateStr}`}</h5>
             <div className="stats-bottom">
               <h2>{formatNumber(datapoint[chartKey1])}</h2>
@@ -448,7 +435,7 @@ function TimeSeries(props) {
 
         <div className="svg-parent is-blue">
           <div className="stats is-blue">
-            <h5 className={`${!moving ? 'title' : ''}`}>Active</h5>
+            <h5 className={`${!moving ? 'title' : ''}`}>{t('Active')}</h5>
             <h5 className={`${moving ? 'title' : ''}`}>{`${dateStr}`}</h5>
             <div className="stats-bottom">
               <h2>{formatNumber(datapoint[chartKey2])}</h2>
@@ -464,7 +451,7 @@ function TimeSeries(props) {
 
         <div className="svg-parent is-green">
           <div className="stats is-green">
-            <h5 className={`${!moving ? 'title' : ''}`}>Recovered</h5>
+            <h5 className={`${!moving ? 'title' : ''}`}>{t('Recovered')}</h5>
             <h5 className={`${moving ? 'title' : ''}`}>{`${dateStr}`}</h5>
             <div className="stats-bottom">
               <h2>{formatNumber(datapoint[chartKey3])}</h2>
@@ -480,7 +467,7 @@ function TimeSeries(props) {
 
         <div className="svg-parent is-gray">
           <div className="stats is-gray">
-            <h5 className={`${!moving ? 'title' : ''}`}>Deceased</h5>
+            <h5 className={`${!moving ? 'title' : ''}`}>{t('Deceased')}</h5>
             <h5 className={`${moving ? 'title' : ''}`}>{`${dateStr}`}</h5>
             <div className="stats-bottom">
               <h2>{formatNumber(datapoint[chartKey4])}</h2>
@@ -497,7 +484,7 @@ function TimeSeries(props) {
         <div className="svg-parent is-purple">
           <div className="stats is-purple">
             <h5 className={`${!moving ? 'title' : ''}`}>
-              Tested {props.isTotal ? testedToolTip : ''}
+              {t('Tested')} {isTotal ? testedToolTip : ''}
             </h5>
             <h5 className={`${moving ? 'title' : ''}`}>{`${dateStr}`}</h5>
             <div className="stats-bottom">
@@ -519,7 +506,7 @@ function TimeSeries(props) {
           onClick={() => setLastDaysCount(Infinity)}
           className={lastDaysCount === Infinity ? 'selected' : ''}
         >
-          Beginning
+          {t('Beginning')}
         </button>
         <button
           type="button"
@@ -527,7 +514,7 @@ function TimeSeries(props) {
           className={lastDaysCount === 30 ? 'selected' : ''}
           aria-label="1 month"
         >
-          1 Month
+          {`1 ${t('Month')}`}
         </button>
         <button
           type="button"
@@ -535,14 +522,14 @@ function TimeSeries(props) {
           className={lastDaysCount === 14 ? 'selected' : ''}
           aria-label="14 days"
         >
-          2 Weeks
+          {`2 ${t('Weeks')}`}
         </button>
       </div>
 
       <div className="alert">
         <Icon.AlertOctagon />
         <div className="alert-right">
-          Tested chart is independent of uniform scaling
+          {t('Tested chart is independent of uniform scaling')}
         </div>
       </div>
     </React.Fragment>

@@ -24,6 +24,12 @@ const months = {
   '12': 'Dec',
 };
 
+export const isDevelopmentOrTest = () => {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
+    return true;
+  return false;
+};
+
 export const getStateName = (code) => {
   return STATE_CODES[code.toUpperCase()];
 };
@@ -227,4 +233,34 @@ export const mergeTimeseries = (ts1, ts2) => {
     }
   }
   return tsRet;
+};
+
+export const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+export const capitalizeAll = (s) => {
+  if (typeof s !== 'string') return '';
+  const str = s.toLowerCase().split(' ');
+  for (let i = 0; i < str.length; i++) {
+    str[i] = capitalize(str[i]);
+  }
+  return str.join(' ');
+};
+
+export const abbreviate = (s) => {
+  return s.slice(0, 1) + s.slice(1).replace(/[aeiou]/gi, '');
+};
+
+export const parseDistrictZones = (data, state) => {
+  const zones = data.reduce((ret, d) => {
+    ret[d.state] = ret[d.state] || {};
+    ret[d.state][d.district] = d;
+    return ret;
+  }, {});
+  Object.values(STATE_CODES).forEach((state) => {
+    if (!zones[state]) zones[state] = {};
+  });
+  return state ? {[state]: zones[state]} : zones;
 };
