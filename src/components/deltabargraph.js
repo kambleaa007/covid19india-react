@@ -1,37 +1,41 @@
+import {COLORS, D3_TRANSITION_DURATION, NUM_BARS_STATEPAGE} from '../constants';
+import {
+  formatDate,
+  formatNumber,
+  getIndiaYesterdayISO,
+  getStatistic,
+} from '../utils/commonfunctions';
+
 import * as d3 from 'd3';
 import equal from 'fast-deep-equal';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 
-const isEqual = (prevProps, currProps) => {
-  if (!equal(prevProps.arrayKey, currProps.arrayKey)) return false;
-  if (!equal(prevProps.timeseries, currProps.timeseries)) return false;
-  return true;
+const getDeltaStatistic = (data, statistic) => {
+  return getStatistic(data, 'delta', statistic);
 };
 
-function DeltaBarGraph({timeseries, arrayKey}) {
-  const [data, setData] = useState([]);
+const [width, height] = [250, 250];
+const margin = {top: 50, right: 0, bottom: 50, left: 0};
+
+function DeltaBarGraph({timeseries, statistic}) {
   const svgRef = useRef();
 
-  useEffect(() => {
-    setData(timeseries);
-  }, [timeseries]);
+  const pastDates = Object.keys(timeseries || {}).filter(
+    (date) => date <= getIndiaYesterdayISO()
+  );
+  const dates = pastDates.slice(-NUM_BARS_STATEPAGE);
 
   useEffect(() => {
-    if (!data.length) return;
-
     const svg = d3.select(svgRef.current);
-    const width = +svg.attr('width');
-    const height = +svg.attr('height');
 
-    const margin = {top: 50, right: 0, bottom: 50, left: 0};
     const chartRight = width - margin.right;
     const chartBottom = height - margin.bottom;
     const r = 5;
 
-    const formatTime = d3.timeFormat('%e %b');
+    // const formatTime = d3.timeFormat('%e %b');
     const xScale = d3
       .scaleBand()
-      .domain(data.map((d) => formatTime(d.date)))
+      .domain(dates)
       .range([margin.left, chartRight])
       .paddingInner(0.33);
 
@@ -40,19 +44,25 @@ function DeltaBarGraph({timeseries, arrayKey}) {
       .domain([
         Math.min(
           0,
-          d3.min(data, (d) => d[arrayKey])
+          d3.min(dates, (date) =>
+            getDeltaStatistic(timeseries[date], statistic)
+          )
         ),
         Math.max(
           1,
-          d3.max(data, (d) => d[arrayKey])
+          d3.max(dates, (date) =>
+            getDeltaStatistic(timeseries[date], statistic)
+          )
         ),
       ])
       .range([chartBottom, margin.top]);
 
-    const xAxis = d3.axisBottom(xScale).tickSize(0);
+    const xAxis = d3
+      .axisBottom(xScale)
+      .tickSize(0)
+      .tickFormat((date) => formatDate(date, 'dd MMM'));
 
-    const t = svg.transition().duration(500);
-    svg.selectAll('.delta').remove();
+    const t = svg.transition().duration(D3_TRANSITION_DURATION);
     svg
       .select('.x-axis')
       .transition(t)
@@ -61,73 +71,80 @@ function DeltaBarGraph({timeseries, arrayKey}) {
       .on('start', () => svg.select('.domain').remove())
       .selectAll('text')
       .attr('y', 0)
-      .attr('dy', (d, i) => (data[i][arrayKey] < 0 ? '-1.5em' : '1.5em'))
+      .attr('dy', (date, i) =>
+        getDeltaStatistic(timeseries[date], statistic) < 0 ? '-1em' : '1.5em'
+      )
       .style('text-anchor', 'middle')
-      .attr('fill', (d, i) => {
-        switch (arrayKey) {
-          case 'dailyconfirmed':
-            return '#dc3545';
-          case 'dailyrecovered':
-            return '#28a745';
-          case 'dailyactive':
-            return '#0479fb';
-          default:
-            return '#6c757d';
-        }
-      });
+      .attr('fill', COLORS[statistic]);
 
     svg
       .selectAll('.bar')
-      .data(data)
-      .join('path')
-      .attr('class', 'bar')
+      .data(dates)
+      .join((enter) =>
+        enter
+          .append('path')
+          .attr('class', 'bar')
+          .attr('d', (date) =>
+            roundedBar(xScale(date), yScale(0), xScale.bandwidth(), 0, r)
+          )
+      )
       .transition(t)
-      .attr('d', (d) =>
+      .attr('d', (date) =>
         roundedBar(
-          xScale(formatTime(d.date)),
+          xScale(date),
           yScale(0),
           xScale.bandwidth(),
-          yScale(0) - yScale(d[arrayKey]),
+          yScale(0) - yScale(getDeltaStatistic(timeseries[date], statistic)),
           r
         )
       )
-      .attr('fill', (d, i) => {
-        if (arrayKey === 'dailyconfirmed')
-          return i < data.length - 1 ? '#dc354590' : '#dc3545';
-        else if (arrayKey === 'dailyrecovered')
-          return i < data.length - 1 ? '#28a74590' : '#28a745';
-        else if (arrayKey === 'dailyactive')
-          return i < data.length - 1 ? '#007bff90' : '#007bff';
-        else return i < data.length - 1 ? '#6c757d90' : '#6c757d';
-      })
-      .on('end', () =>
-        svg
-          .selectAll('.delta')
-          .data(arrayKey === 'dailyconfirmed' ? data : [])
-          .join('text')
-          .attr('class', 'delta')
-          .attr('text-anchor', 'middle')
-          .attr('font-size', '11px')
-          .attr('x', (d) => xScale(formatTime(d.date)) + xScale.bandwidth() / 2)
-          .attr('y', (d) => yScale(d[arrayKey]) - 6)
-          .text((d) => d[arrayKey])
-          .append('tspan')
-          .attr('class', 'percent')
-          .attr('x', (d) => xScale(formatTime(d.date)) + xScale.bandwidth() / 2)
-          .attr('dy', '-1.2em')
-          .text((d, i) =>
-            i && data[i - 1][arrayKey]
-              ? d3.format('+.1%')(
-                  (data[i][arrayKey] - data[i - 1][arrayKey]) /
-                    data[i - 1][arrayKey]
-                )
-              : ''
-          )
+      .attr('fill', (date, i) => {
+        return i < date.length - 1
+          ? COLORS[statistic] + '90'
+          : COLORS[statistic];
+      });
+
+    const textSelection = svg
+      .selectAll('.label')
+      .data(dates)
+      .join('text')
+      .attr('class', 'label')
+      .attr('x', (date) => xScale(date) + xScale.bandwidth() / 2)
+      .text((date) =>
+        formatNumber(getDeltaStatistic(timeseries[date], statistic))
       );
-  }, [data, arrayKey]);
+
+    textSelection
+      .transition(t)
+      .attr('fill', COLORS[statistic])
+      .attr('y', (date) => {
+        const val = getDeltaStatistic(timeseries[date], statistic);
+        return yScale(val) + (val < 0 ? 15 : -6);
+      });
+
+    textSelection
+      .append('tspan')
+      .attr(
+        'dy',
+        (date) =>
+          `${getDeltaStatistic(timeseries[date], statistic) < 0 ? 1.2 : -1.2}em`
+      )
+      .attr('x', (date) => xScale(date) + xScale.bandwidth() / 2)
+      .text((date, i) => {
+        if (i === 0) return '';
+        const prevVal = getDeltaStatistic(timeseries[dates[i - 1]], statistic);
+        if (!prevVal) return '';
+        const delta = getDeltaStatistic(timeseries[date], statistic) - prevVal;
+        return `${delta > 0 ? '+' : ''}${formatNumber(
+          (100 * delta) / Math.abs(prevVal)
+        )}%`;
+      })
+      .transition(t)
+      .attr('fill', COLORS[statistic] + '90');
+  }, [dates, timeseries, statistic]);
 
   return (
-    <div className="DeltaBarGraph fadeInUp" style={{animationDelay: '0.8s'}}>
+    <div className="DeltaBarGraph">
       <svg
         ref={svgRef}
         width="250"
@@ -135,12 +152,20 @@ function DeltaBarGraph({timeseries, arrayKey}) {
         viewBox="0 0 250 250"
         preserveAspectRatio="xMidYMid meet"
       >
-        <g className="x-axis" />
+        <g
+          className="x-axis"
+          transform={`translate(0, ${height - margin.bottom})`}
+        />
         <g className="y-axis" />
       </svg>
     </div>
   );
 }
+
+const isEqual = (prevProps, currProps) => {
+  if (!equal(prevProps.statistic, currProps.statistic)) return false;
+  return true;
+};
 
 export default React.memo(DeltaBarGraph, isEqual);
 

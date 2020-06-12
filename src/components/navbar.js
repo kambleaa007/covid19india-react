@@ -1,47 +1,78 @@
-import anime from 'animejs';
+import locales from '../i18n/locales.json';
+
 import React, {useState, useRef} from 'react';
 import * as Icon from 'react-feather';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
-import {
-  useEffectOnce,
-  useLockBodyScroll,
-  useWindowSize,
-  useLocalStorage,
-} from 'react-use';
+import {useSpring, useTransition, animated} from 'react-spring';
+import {useLockBodyScroll, useWindowSize} from 'react-use';
 
-const navLinkProps = (path, animationDelay) => ({
-  className: `fadeInUp ${window.location.pathname === path ? 'focused' : ''}`,
-  style: {
-    animationDelay: `${animationDelay}s`,
-  },
-});
+const SLIDE_IN = {
+  position: 'absolute',
+  transform: 'translate3d(-20rem, 0, 0)',
+  height: '100vh',
+  zIndex: -1,
+};
 
-const activeNavIcon = (path) => ({
-  style: {
-    stroke: window.location.pathname === path ? '#4c75f2' : '',
-  },
-});
+const SLIDE_OUT = {
+  position: 'absolute',
+  transform: 'translate3d(10rem, 0, 0)',
+};
 
-function Navbar({pages, darkMode, setDarkMode}) {
+const SLIDE_IN_MOBILE = {
+  opacity: 1,
+  position: 'absolute',
+  height: '100vh',
+  top: 64,
+  zIndex: 999,
+};
+
+const SLIDE_OUT_MOBILE = {
+  opacity: 1,
+  position: 'absolute',
+  height: '100vh',
+  top: 64,
+  zIndex: 999,
+};
+
+function Navbar({
+  pages,
+  darkMode,
+  showLanguageSwitcher,
+  setShowLanguageSwitcher,
+}) {
+  const {i18n, t} = useTranslation();
+  const currentLanguage = Object.keys(locales).includes(i18n?.language)
+    ? i18n?.language
+    : i18n?.options?.fallbackLng[0];
+
   const [expand, setExpand] = useState(false);
-  // eslint-disable-next-line
-  const [isThemeSet, setIsThemeSet] = useLocalStorage('isThemeSet', false);
 
   useLockBodyScroll(expand);
   const windowSize = useWindowSize();
 
+  const [spring, set, stop] = useSpring(() => ({opacity: 0}));
+  set({opacity: 1});
+  stop();
+
+  const transitions = useTransition(expand, null, {
+    from: windowSize.width < 769 ? SLIDE_IN_MOBILE : SLIDE_IN,
+    enter: windowSize.width < 769 ? SLIDE_OUT_MOBILE : SLIDE_OUT,
+    leave: windowSize.width < 769 ? SLIDE_IN_MOBILE : SLIDE_IN,
+    config: {mass: 1, tension: 210, friction: 26},
+  });
+
   return (
-    <div className="Navbar">
+    <animated.div className="Navbar" style={spring}>
       <div
         className="navbar-left"
         onClick={() => {
-          setDarkMode((prevMode) => !prevMode);
-          setIsThemeSet(true);
+          setShowLanguageSwitcher((prevState) => !prevState);
         }}
       >
-        {darkMode ? <Icon.Sun color={'#ffc107'} /> : <Icon.Moon />}
+        {locales[currentLanguage]}
       </div>
+
       <div className="navbar-middle">
         <Link
           to="/"
@@ -59,23 +90,15 @@ function Navbar({pages, darkMode, setDarkMode}) {
           setExpand(!expand);
         }}
         onMouseEnter={() => {
-          if (window.innerWidth > 769) {
+          if (windowSize.width > 769) {
             setExpand(true);
-            anime({
-              targets: '.navbar-right path',
-              strokeDashoffset: [anime.setDashoffset, 0],
-              easing: 'easeInOutSine',
-              duration: 250,
-              delay: function (el, i) {
-                return i * 250;
-              },
-              direction: 'alternate',
-              loop: false,
-            });
           }
         }}
       >
-        {windowSize.width < 769 && <span>{expand ? 'Close' : 'Menu'}</span>}
+        {windowSize.width < 769 && (
+          <span>{expand ? t('Close') : t('Menu')}</span>
+        )}
+
         {windowSize.width > 769 && (
           <React.Fragment>
             <span>
@@ -89,11 +112,6 @@ function Navbar({pages, darkMode, setDarkMode}) {
               </Link>
             </span>
             <span>
-              <Link to="/deepdive">
-                <Icon.BarChart2 {...activeNavIcon('/deepdive')} />
-              </Link>
-            </span>
-            <span>
               <Link to="/essentials">
                 <Icon.Package {...activeNavIcon('/essentials')} />
               </Link>
@@ -103,34 +121,34 @@ function Navbar({pages, darkMode, setDarkMode}) {
                 <Icon.HelpCircle {...activeNavIcon('/about')} />
               </Link>
             </span>
+            <span>{windowSize.width > 768 && <SunMoon {...{darkMode}} />}</span>
           </React.Fragment>
         )}
       </div>
 
-      {expand && <Expand expand={expand} pages={pages} setExpand={setExpand} />}
-    </div>
+      {transitions.map(({item, key, props}) =>
+        item ? (
+          <animated.div key={key} style={props}>
+            <Expand {...{pages, setExpand, darkMode, windowSize}} />
+          </animated.div>
+        ) : (
+          <animated.div key={key} style={props}></animated.div>
+        )
+      )}
+    </animated.div>
   );
 }
 
-function Expand({expand, pages, setExpand}) {
+function Expand({pages, setExpand, darkMode, windowSize}) {
   const expandElement = useRef(null);
   const {t} = useTranslation();
-
-  useEffectOnce(() => {
-    anime({
-      targets: expandElement.current,
-      translateX: '10rem',
-      easing: 'easeOutExpo',
-      duration: 250,
-    });
-  });
 
   return (
     <div
       className="expand"
       ref={expandElement}
       onMouseLeave={() => {
-        setExpand(false);
+        windowSize.width > 768 && setExpand(false);
       }}
     >
       {pages.map((page, i) => {
@@ -154,7 +172,9 @@ function Expand({expand, pages, setExpand}) {
         return null;
       })}
 
-      <div className="expand-bottom fadeInUp" style={{animationDelay: '1s'}}>
+      {windowSize.width < 768 && <SunMoon {...{darkMode}} />}
+
+      <div className="expand-bottom">
         <h5>{t('A crowdsourced initiative.')}</h5>
       </div>
     </div>
@@ -162,3 +182,28 @@ function Expand({expand, pages, setExpand}) {
 }
 
 export default Navbar;
+
+const navLinkProps = (path, animationDelay) => ({
+  className: `${window.location.pathname === path ? 'focused' : ''}`,
+});
+
+const activeNavIcon = (path) => ({
+  style: {
+    stroke: window.location.pathname === path ? '#4c75f2' : '',
+  },
+});
+
+const SunMoon = ({darkMode}) => {
+  return (
+    <div
+      className="SunMoon"
+      onClick={() => {
+        darkMode.toggle();
+      }}
+    >
+      <div>
+        {darkMode.value ? <Icon.Sun color={'#ffc107'} /> : <Icon.Moon />}
+      </div>
+    </div>
+  );
+};

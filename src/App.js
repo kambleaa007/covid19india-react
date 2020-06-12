@@ -1,25 +1,33 @@
-import Home from './components/home';
+import './App.scss';
+import LanguageSwitcher from './components/languageswitcher';
 import Navbar from './components/navbar';
 import ScrollToTop from './utils/ScrollToTop';
 
-import React, {Suspense, lazy} from 'react';
+import React, {lazy, useState, Suspense} from 'react';
 import {Helmet} from 'react-helmet';
-import {useTranslation} from 'react-i18next';
 import {
   BrowserRouter as Router,
   Route,
   Redirect,
   Switch,
 } from 'react-router-dom';
-import {useLocalStorage, useEffectOnce} from 'react-use';
+import useDarkMode from 'use-dark-mode';
 
-import './App.scss';
-
-const DeepDive = lazy(() => import('./components/deepdive'));
-const FAQ = lazy(() => import('./components/faq'));
-const PatientDB = lazy(() => import('./components/patientdb'));
-const Resources = lazy(() => import('./components/resources'));
-const State = lazy(() => import('./components/state'));
+const Home = lazy(() =>
+  import('./components/home' /* webpackChunkName: "Home" */)
+);
+const FAQ = lazy(() =>
+  import('./components/faq' /* webpackChunkName: "About" */)
+);
+const Demographics = lazy(() =>
+  import('./components/demographics' /* webpackChunkName: "Demographics" */)
+);
+const State = lazy(() =>
+  import('./components/state' /* webpackChunkName: "State" */)
+);
+const Essentials = lazy(() =>
+  import('./components/essentials' /* webpackChunkName: "Essentials" */)
+);
 
 const schemaMarkup = {
   '@context': 'http://schema.org/',
@@ -31,79 +39,41 @@ const schemaMarkup = {
 };
 
 function App() {
-  const {t} = useTranslation();
+  const darkMode = useDarkMode(false);
+  const [showLanguageSwitcher, setShowLanguageSwitcher] = useState(false);
 
   const pages = [
     {
       pageLink: '/',
       view: Home,
       displayName: 'Home',
-      animationDelayForNavbar: 0.2,
       showInNavbar: true,
     },
     {
       pageLink: '/demographics',
-      view: PatientDB,
-      displayName: t('Demographics'),
-      animationDelayForNavbar: 0.3,
-      showInNavbar: true,
-    },
-    {
-      pageLink: '/deepdive',
-      view: DeepDive,
-      displayName: t('Deep Dive'),
-      animationDelayForNavbar: 0.4,
+      view: Demographics,
+      displayName: 'Demographics',
       showInNavbar: true,
     },
     {
       pageLink: '/essentials',
-      view: Resources,
-      displayName: t('Essentials'),
-      animationDelayForNavbar: 0.5,
+      view: Essentials,
+      displayName: 'Essentials',
       showInNavbar: true,
     },
     {
       pageLink: '/about',
       view: FAQ,
-      displayName: t('About'),
-      animationDelayForNavbar: 0.6,
+      displayName: 'About',
       showInNavbar: true,
     },
     {
       pageLink: '/state/:stateCode',
       view: State,
-      displayName: t('State'),
-      animationDelayForNavbar: 0.7,
+      displayName: 'State',
       showInNavbar: false,
     },
   ];
-
-  const [darkMode, setDarkMode] = useLocalStorage('darkMode', false);
-  const [isThemeSet] = useLocalStorage('isThemeSet', false);
-
-  useEffectOnce(() => {
-    if (
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches &&
-      !isThemeSet
-    ) {
-      setDarkMode(true);
-    } else if (
-      window.matchMedia &&
-      !window.matchMedia('(prefers-color-scheme: dark)').matches &&
-      !isThemeSet
-    ) {
-      setDarkMode(false);
-    }
-  });
-
-  React.useEffect(() => {
-    if (darkMode) {
-      document.querySelector('body').classList.add('dark-mode');
-    } else {
-      document.querySelector('body').classList.remove('dark-mode');
-    }
-  }, [darkMode]);
 
   return (
     <div className="App">
@@ -113,37 +83,37 @@ function App() {
         </script>
       </Helmet>
 
-      <Router>
-        <ScrollToTop />
-        <Suspense fallback={<div className="lazy"></div>}>
+      <LanguageSwitcher {...{showLanguageSwitcher, setShowLanguageSwitcher}} />
+
+      <Suspense fallback={<div />}>
+        <Router>
+          <ScrollToTop />
+          <Navbar
+            pages={pages}
+            {...{darkMode}}
+            {...{showLanguageSwitcher, setShowLanguageSwitcher}}
+          />
           <Route
             render={({location}) => (
-              <div className="Almighty-Router">
-                <Navbar
-                  pages={pages}
-                  darkMode={darkMode}
-                  setDarkMode={setDarkMode}
-                />
+              <React.Fragment>
                 <Switch location={location}>
                   {pages.map((page, index) => {
                     return (
                       <Route
                         exact
                         path={page.pageLink}
-                        render={({match}) => (
-                          <page.view key={match.params.stateCode || index} />
-                        )}
+                        render={({match}) => <page.view />}
                         key={index}
                       />
                     );
                   })}
                   <Redirect to="/" />
                 </Switch>
-              </div>
+              </React.Fragment>
             )}
           />
-        </Suspense>
-      </Router>
+        </Router>
+      </Suspense>
     </div>
   );
 }

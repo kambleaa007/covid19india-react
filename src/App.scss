@@ -18,6 +18,7 @@ $cherry-light-opaque: #ffe0e6;
 $red: #dc3545;
 $red-light: #dc354520;
 $red-mid: #dc354599;
+$red-hover: #dc354530;
 $orange: #fd7e14;
 $orange-mid: #fd7e1499;
 $orange-light: #fd7e1420;
@@ -42,6 +43,8 @@ $gray-hover: #6c757d20;
 $gray-mid: #6c757d99;
 $gray-dark: #343a40;
 $gray-opaque: #f1f1f1;
+$gray-hover-opaque: #edeeef;
+$gray-hover-darker-opaque: #f6f6f7;
 $light: #f8f9fa;
 $dark: #343a40;
 $purple: #201aa2dd;
@@ -58,6 +61,7 @@ $brown-light: #b6854d10;
 $brown-hover: #b6854d30;
 $brown-mid: #b6854d99;
 $brick: #e23028;
+$brick-light: #e2302810;
 
 // Dark mode variables
 $dark-m-gray: #161625;
@@ -65,6 +69,11 @@ $dark-mid-subtext: #bdb8ae;
 $dark-m-white: #e1e1e1;
 $dark-m-purple: #7ba1ea;
 $dark-m-blue: #3391ff;
+
+html {
+  overflow-x: hidden;
+  width: 100vw;
+}
 
 body {
   -webkit-tap-highlight-color: transparent;
@@ -110,43 +119,31 @@ h6 {
 }
 
 .App {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-}
-
-.switch-wrapper {
-  position: relative;
-}
-
-.switch-wrapper > div {
-  position: absolute;
-  transition: all .25s ease-in-out;
-  width: 100%;
 }
 
 .arrow-up {
   border-bottom: 5px solid $gray-mid;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  margin-left: .25rem;
+  margin-left: 0.25rem;
 }
 
 .arrow-down {
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid $gray-mid;
-  margin-left: .25rem;
+  margin-left: 0.25rem;
 }
 
 .Navbar {
+  align-items: center;
   display: flex;
   flex-direction: row;
-  height: 3.9rem;
+  height: 4rem;
   justify-content: space-between;
-  padding-bottom: 1rem;
-
-  & > * {
-    align-self: center;
-  }
 
   a {
     color: inherit;
@@ -154,12 +151,18 @@ h6 {
   }
 
   .navbar-left {
-    color: $gray;
+    color: $gray-mid;
     cursor: pointer;
     font-family: 'archia';
     font-size: 12px;
     font-weight: 600;
     padding: 1.5rem;
+    text-align: center;
+    width: 3rem;
+
+    &:hover {
+      color: $gray;
+    }
   }
 
   .navbar-middle {
@@ -175,19 +178,25 @@ h6 {
   }
 
   .navbar-right {
-    color: $gray;
+    color: $gray-mid;
     cursor: pointer;
     font-family: 'archia';
     font-size: 12px;
     font-weight: 600;
     padding: 1.5rem;
-    transition: all 0s ease-in-out;
-    width: 2rem;
+    text-align: center;
+    width: 3rem;
 
     &:hover {
-      background: $pblue;
-      color: #fff;
+      color: $gray;
     }
+  }
+
+  .language-toggle {
+    cursor: pointer;
+    font-family: 'archia';
+    font-weight: 900;
+    text-transform: uppercase;
   }
 
   .expand {
@@ -196,10 +205,6 @@ h6 {
     display: flex;
     flex-direction: column;
     font-family: 'archia';
-    height: 100vh;
-    position: absolute;
-    top: 3.85rem;
-    transform: none;
     width: 100vw;
     z-index: 9999;
 
@@ -207,7 +212,7 @@ h6 {
       border-bottom: 1px solid $gray-light;
       border-top: 1px solid $gray-light;
       padding: 1.5rem;
-      transition: all .15s ease-in-out;
+      transition: all 0.15s ease-in-out;
 
       &:hover {
         background: $gray-hover;
@@ -217,7 +222,7 @@ h6 {
         &.focused {
           background: $pblue-light;
           color: $pblue;
-          padding: .25rem;
+          padding: 0.25rem;
         }
       }
     }
@@ -225,6 +230,13 @@ h6 {
     .expand-bottom {
       align-self: flex-start;
       border: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      h5 {
+        margin: 0;
+      }
 
       &:hover {
         background: none;
@@ -258,9 +270,14 @@ h6 {
     margin-right: 2.5rem;
     min-height: 10rem;
   }
+
+  .header {
+    z-index: 99;
+  }
 }
 
 .alert {
+  align-items: flex-start;
   background: $gray-light;
   border-radius: 5px;
   color: $gray;
@@ -268,30 +285,32 @@ h6 {
   flex-direction: row;
   font-family: 'archia';
   font-size: 10px;
-  margin-right: .5rem;
-  padding: .5rem;
-  width: 6rem;
+  padding: 0.5rem;
 
   svg {
     color: $gray-mid;
-    margin-right: .25rem;
-    margin-top: -.25rem;
-    stroke-width: 2px;
-    width: 36px !important;
+    height: 16px;
+    width: 16px;
   }
 
   .alert-right {
-    width: 10rem;
+    margin-left: .25rem;
+    text-align: right;
+    width: 5rem;
 
     a {
       background: $gray-light;
       color: $gray;
-      padding-left: .1rem;
-      padding-right: .1rem;
+      padding-left: 0.1rem;
+      padding-right: 0.1rem;
 
       &:hover {
         background: $gray-hover;
       }
+    }
+
+    &.is-full {
+      width: 100%;
     }
   }
 
@@ -318,6 +337,7 @@ h6 {
     flex-direction: row;
     justify-content: space-between;
     margin-top: 1.5rem;
+    position: relative;
     width: calc(100% - 3rem);
 
     & > * {
@@ -338,6 +358,7 @@ h6 {
       h5 {
         color: $gray;
         font-weight: 600;
+        margin-top: .5rem;
       }
     }
 
@@ -345,7 +366,7 @@ h6 {
       color: $purple-mid;
       display: flex;
       flex-direction: column;
-      margin-top: .1rem;
+      margin-top: 0.1rem;
       text-align: right;
 
       h2,
@@ -364,7 +385,7 @@ h6 {
         background: $purple-light;
         color: inherit;
         text-decoration: none;
-        transition: all .2s ease-in-out;
+        transition: all 0.2s ease-in-out;
 
         &:hover {
           background: $purple-hover;
@@ -383,6 +404,7 @@ h6 {
   .state-left {
     margin-left: 2.5rem;
     margin-right: 2.5rem;
+    position: relative;
   }
 
   .state-right {
@@ -401,8 +423,8 @@ h6 {
     display: none;
     flex-direction: row;
     justify-content: center;
-    padding: .5rem;
-    transition: all .2s ease-in-out;
+    padding: 0.5rem;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
       background: $gray-hover;
@@ -424,22 +446,8 @@ h6 {
     }
   }
 
-  .meta-secondary {
-    align-self: center;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 3rem;
-    margin-top: 3rem;
-  }
-
-  .district-bar,
-  .to-essentials {
+  .district-bar {
     width: 100%;
-  }
-
-  .MapExplorer,
-  .meta-secondary {
-    width: calc(100% - 3rem);
   }
 
   .Minigraph {
@@ -450,39 +458,26 @@ h6 {
 
   .MapExplorer {
     margin-top: 2rem;
+    width: calc(100% - 3rem);
 
     .header,
     .map-stats,
-    .back-button,
+    .map-button,
+    .tabs-map,
     .last-update,
-    .unknown,
-    .footnote,
-    .state-page-button {
+    .footnote {
       display: none;
     }
 
     .anchor {
       display: none;
     }
-
-    .svg-parent {
-      &:not(.legend) {
-        height: 400px;
-        width: 100%;
-
-        svg {
-          height: 100%;
-        }
-      }
-    }
   }
 
-  .__react_component_tooltip {
-    font-family: 'archia';
-    font-size: 11px;
-    font-weight: 600;
-    padding: .25rem;
-    text-align: center;
+  .TimeSeriesExplorer {
+    .anchor {
+      display: none;
+    }
   }
 }
 
@@ -499,20 +494,11 @@ h6 {
     flex-direction: row !important;
     justify-content: space-between !important;
     margin: 0;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    margin-top: 2.5rem;
 
     .alert {
       margin: 0;
-    }
-  }
-
-  .__react_component_tooltip {
-    font-size: .8em;
-    padding: 1rem;
-
-    img {
-      filter: invert(1);
-      width: 20rem;
     }
   }
 
@@ -575,8 +561,8 @@ h6 {
       svg {
         align-self: flex-start;
         cursor: pointer;
-        stroke-width: 3;
-        width: 12px;
+        stroke-width: 2.5px;
+        width: 16px;
       }
     }
 
@@ -723,433 +709,192 @@ h6 {
   }
 }
 
-.breadcrumb {
-  cursor: pointer;
+.StateDropdown {
+  align-items: center;
   display: flex;
   flex-direction: row;
-  font-family: 'archia';
-  font-size: .75rem;
-  padding-left: 1.5rem;
+  position: relative;
 
-  ul {
-    background: $light;
-    border: 2px solid $gray-light;
-    box-shadow: none;
-    max-height: 20rem;
-    overflow-y: scroll;
+  .state-name {
+    background: $brick-light;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: .25rem;
+    transform: translate3d(-.25rem, 0, 0);
   }
 
-  .item {
-    a {
-      color: $gray;
-      width: 100%;
-    }
+  .dropdown {
+    background: $white;
+    border-radius: 5px;
+    height: 25rem;
+    left: -.25rem;
+    overflow-y: scroll;
+    position: absolute;
+    top: 2.75rem;
+    width: 15rem;
+    z-index: 999;
 
-    &:hover {
-      background: $gray-hover;
+    .item {
+      color: $red;
+      cursor: pointer;
+      font-family: 'archia';
+      padding: 0.75rem;
 
-      a {
-        background: transparent;
-        color: $gray;
+      &:hover {
+        background: $red-hover;
       }
     }
   }
 
-  a {
-    color: $gray;
-    font-family: 'archia';
-    font-size: .75rem;
-    margin-right: .25rem;
-    text-decoration: none;
-    transition: all .2s ease-in-out;
-
-    &:not(:first-child) {
-      margin-left: .25rem;
-    }
-
-    &:hover {
-      background: $gray-hover;
-      text-decoration: none;
-    }
-
-    &.selected {
-      background: $gray-light;
-      color: $gray;
-    }
-  }
-
-  .caret {
-    color: $gray;
-    margin-left: 0;
-    transition: all .1s ease-in-out;
-
-    &:hover {
-      color: $gray-dark;
-    }
-  }
-
-  summary {
-    &:focus {
-      outline: none;
-    }
+  .backdrop {
+    background: $red-light;
+    height: 100vh;
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 10;
   }
 }
 
-.height-22 {
-  height: 22px;
-}
+.Essentials {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+  width: 30rem;
 
-.disclaimercontainer {
-  svg {
-    margin-left: 2px;
+  img,
+  .alert {
+    align-self: center;
   }
 
-  .mobile-disclaimer-button {
-    background-color: #fff;
-    color: #808080;
-    font-size: xx-small;
-    justify-content: center;
+  .alert {
+    margin: 0;
+    margin-top: 2rem;
+    width: 90% !important;
+    word-wrap: break-word;
 
+    .alert-right {
+      text-align: left;
+    }
 
     svg {
-      font-size: .75rem;
+      margin: 0;
     }
   }
 
-  .disclaimer-button {
-    background: none;
-    color: $gray-mid;
-    font-size: .7rem;
-    font-weight: 500;
-    text-transform: none;
+  button {
+    align-self: center;
+    background: $yellow-light;
+    color: $orange;
+    display: flex;
+    flex-direction: row;
+    font-weight: 400;
+    justify-content: center;
+    margin: 0;
+    padding: .75rem;
+    text-transform: unset;
+
+    * {
+      align-self: center;
+    }
+
+    svg {
+      margin-left: .5rem;
+      padding-right: 0;
+    }
+
+    &:hover {
+      background: $yellow-hover;
+    }
+  }
+
+  .address {
+    align-self: center;
+    color: $gray;
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+
+    h3 {
+      margin-right: 1rem;
+    }
+
+    svg {
+      cursor: pointer;
+      margin-bottom: 2px;
+      stroke: $gray-mid;
+      stroke-width: 3px;
+    }
+
+    * {
+      align-self: center;
+    }
+  }
+
+  .essential-result {
+    background: $gray-light;
+    border: transparent !important;
+    border-radius: 5px;
+    cursor: default !important;
+    margin-bottom: 1rem;
   }
 }
 
-.Resources {
+.labels {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
-  margin-left: 9rem;
-  margin-right: 4rem;
+  margin-bottom: 1rem;
 
-  .resource-left,
-  .resource-right {
-    display: flex;
-    flex-direction: column;
-    width: 30rem;
-  }
-
-  .resource-left {
-    margin-left: 2.5rem;
-    margin-right: 2.5rem;
-  }
-
-  .resource-right {
-    margin-left: 2.5rem;
-    margin-right: 2.5rem;
-  }
-
-  .tableandaccordions {
+  .label {
     align-items: center;
+    background: $gray-light !important;
+    border-radius: 5px !important;
+    color: $gray-mid !important;
+    cursor: pointer;
     display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
+    flex-direction: row;
+    font-family: 'archia' !important;
+    font-size: 14px;
+    margin-bottom: 0.25rem;
+    margin-right: .25rem;
+    padding: .25rem .5rem;
+    text-transform: capitalize;
 
-  table {
-    align-self: center;
-    border-collapse: separate;
-    border-spacing: 3px 2px;
-    font-family: 'archia';
-    position: relative;
-    table-layout: fixed;
-    text-transform: none;
-    width: 100%;
-
-    thead {
-      background: $purple-light;
-      color: $gray-dark;
-      font-size: .9rem;
-      text-align: center;
-
-      th {
-        border-radius: 5px;
-        cursor: pointer;
-        padding: .5rem;
-        transition: all .1s ease-in-out;
-        z-index: 99;
-
-        &.descriptionCol {
-          width: 50%;
-        }
-
-        &.sticky {
-          background: $gray-opaque;
-          top: 0;
-        }
-
-        &:hover {
-          background: #ecedee;
-        }
-
-        .heading-content {
-          align-items: center;
-          display: flex;
-          flex-direction: row;
-          height: .9rem;
-          justify-content: space-between;
-          position: relative;
-
-          abbr {
-            text-align: right;
-          }
-
-          svg {
-            color: $gray-mid;
-            margin: 0;
-            margin-left: .25rem;
-            margin-top: .15rem;
-            right: 0;
-            stroke-width: 4px;
-            width: 10px;
-          }
-        }
-      }
-    }
-
-    tbody {
-      color: $gray;
-      max-width: 10rem;
-
-      tr {
-        transition: background .1s ease-in-out;
-
-        &:hover {
-          background: $gray-hover !important;
-        }
-
-        &.divider {
-          background: #6c757d10 !important;
-          height: .5rem;
-        }
-
-        &.spacer {
-          background: #fff !important;
-          height: .5rem;
-        }
-      }
-
-      td {
-        border-radius: 5px;
-        font-size: .7rem;
-        text-align: left;
-
-        &:first-child {
-          max-width: 7.5rem;
-          text-align: left;
-          word-wrap: break-word;
-        }
-
-        .deltas {
-          font-size: 11px !important;
-          margin-right: .25rem;
-        }
-      }
-
-      .state-last-update {
-        background: transparent !important;
-
-        &:hover {
-          background: transparent !important;
-        }
-
-        td {
-          .last-update {
-            align-items: baseline;
-            display: flex;
-            flex-direction: row;
-            text-align: left;
-            width: 100%;
-          }
-        }
-      }
-
-      .district-heading {
-        background: $gray-light;
-
-        td {
-          background: $gray-light;
-          color: $gray-dark;
-          font-size: .75rem;
-          font-weight: 900;
-          padding: .45rem;
-
-
-          .heading-content {
-            align-items: center;
-            display: flex;
-            flex-direction: row;
-            height: .9rem;
-            justify-content: space-between;
-            position: relative;
-
-            abbr {
-              text-align: right;
-            }
-
-            svg {
-              color: $gray-mid;
-              margin: 0;
-              margin-left: .25rem;
-              margin-top: .15rem;
-              right: 0;
-              stroke-width: 4px;
-              width: 10px;
-            }
-          }
-        }
-      }
-    }
-
-    .affected-count {
-      color: $gray-mid;
-      margin: 0;
-      position: absolute;
-      right: 0;
-      top: -1rem;
-    }
-
-    .is-total {
-      td {
-        background: $gray-hover;
-      }
-    }
-
-    .dropdown {
-      background: $gray-light;
-      border-radius: 50%;
-      cursor: pointer;
-      height: 13px;
-      left: -.75rem;
-      margin-top: .5rem;
-      position: absolute;
-      transition: background .2s ease-in-out;
-      width: 13px;
+    &.is-selected {
+      background: $yellow-hover !important;
+      color: $orange-mid !important;
 
       &:hover {
-        background: $gray-hover;
-      }
-
-      svg {
-        left: 1px;
-        position: absolute;
-        stroke-width: 3;
-        top: -.35rem;
-        width: 11px;
+        background: $yellow-hover !important;
+        color: $orange-mid !important;
       }
     }
+
+    @media not all and (pointer: coarse) {
+      &:hover {
+        background: $yellow-light !important;
+        color: $orange-mid !important;
+      }
+    }
+
+    .count {
+      align-items: center;
+      background: inherit;
+      border-radius: 50%;
+      color: inherit;
+      display: flex;
+      flex-direction: row;
+      font-size: 12px;
+      height: 1.5rem;
+      justify-content: center;
+      margin-left: 0.25rem;
+      width: 1.5rem;
+    }
   }
-}
-
-.filtersection {
-  animation-duration: 1s;
-  animation-name: fadeInUp;
-  animation-timing-function: ease-in;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-  width: 80%;
-
-
-  .filtertitle {
-    align-self: center;
-    color: $cherry;
-  }
-}
-
-.resourcefilters {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-
-
-  .button {
-    padding: .4rem;
-  }
-}
-
-.resourcefilter {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  margin-left: 1rem;
-  margin-right: 1rem;
-
-
-  .filterlabel {
-    font-family: 'archia';
-    font-size: 11px !important;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  select {
-    width: 100%;
-  }
-}
-
-.searchbar {
-  font-family: 'archia';
-  font-size: .7rem !important;
-  font-weight: 400;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  text-align: center;
-  width: 100%;
-
-
-  #input-field-searchbar {
-    font-family: 'archia';
-    font-size: .7rem !important;
-    font-weight: 400;
-    height: .1rem;
-  }
-}
-
-.pagination {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-
-
-  .button {
-    align-items: center;
-    height: 70%;
-    justify-content: space-between;
-    margin-left: .7rem;
-    margin-right: .7rem;
-    margin-top: .7rem;
-    padding-left: 1.1rem;
-    width: 3rem;
-  }
-
-  select {
-    margin: .7rem .7rem .2rem .1rem;
-  }
-
-  input {
-    margin: .7rem .7rem .2rem;
-    width: 100px;
-  }
-}
-
-.paginationbutton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
 }
 
 .Banner {
@@ -1158,11 +903,10 @@ h6 {
   display: flex;
   flex-direction: row;
   font-family: 'Archia';
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: 600;
   justify-content: center;
   line-height: 20px;
-
 
   .snippet {
     align-self: center;
@@ -1188,7 +932,7 @@ h6 {
   label {
     color: $gray;
     font-family: 'archia';
-    font-size: .75rem;
+    font-size: 0.75rem;
     margin-bottom: 1rem;
   }
 
@@ -1199,13 +943,13 @@ h6 {
   }
 
   input {
-    -moz-box-shadow: 0 10px 35px rgba(0, 0, 0, .1);
+    -moz-box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
     -webkit-appearance: none !important;
-    -webkit-box-shadow: 0 10px 35px rgba(0, 0, 0, .1);
+    -webkit-box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
     background: #fff;
     border: 0;
     border-radius: 5px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, .1);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
     color: $gray;
     font-family: 'archia';
     font-size: 1rem;
@@ -1213,8 +957,12 @@ h6 {
     outline: none;
     padding: 1rem;
     padding-left: 3rem;
-    transition: all .2s ease-in-out;
     width: calc(100% - 4rem);
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    width: 100%;
   }
 
   .search-placeholder {
@@ -1222,7 +970,7 @@ h6 {
     font-family: 'archia';
     font-size: 1rem;
     left: 3rem;
-    opacity: .8;
+    opacity: 0.8;
     pointer-events: none;
     position: absolute;
     top: 4.3rem;
@@ -1236,15 +984,15 @@ h6 {
   .search-button {
     svg {
       color: $gray-mid;
-      left: .75rem;
+      left: 0.75rem;
       position: absolute;
-      top: 4.15rem;
-      transition: all .2s ease-in-out;
+      top: 1.25rem;
+      transition: all 0.2s ease-in-out;
     }
 
     &.is-expand {
       svg {
-        left: .5rem;
+        left: 0.5rem;
       }
     }
   }
@@ -1259,8 +1007,8 @@ h6 {
     justify-content: center;
     position: absolute;
     right: 1rem;
-    top: 4.15rem;
-    transition: all .2s ease-in-out;
+    top: 1.35rem;
+    transition: all 0.2s ease-in-out;
     width: 20px;
 
     &:hover {
@@ -1268,7 +1016,7 @@ h6 {
     }
 
     &.is-expand {
-      right: .75rem;
+      right: 0.75rem;
     }
 
     svg {
@@ -1278,6 +1026,27 @@ h6 {
       stroke-width: 3;
       width: 12px;
     }
+
+    &.custom {
+      background: $pink-light !important;
+      pointer-events: none;
+      z-index: 0;
+
+      svg {
+        stroke: $pink !important;
+      }
+    }
+  }
+
+  .feature {
+    background: $pink-light;
+    border-radius: 5px;
+    color: $pink;
+    cursor: pointer;
+    font-family: 'archia';
+    font-size: .75rem;
+    padding: .75rem;
+    text-align: center;
   }
 
   .expanded {
@@ -1297,12 +1066,12 @@ h6 {
       color: $gray;
       font-weight: 600;
       margin: 0;
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     h3 {
       color: $pblue;
-      margin-bottom: .75rem;
+      margin-bottom: 0.75rem;
     }
   }
 
@@ -1315,6 +1084,12 @@ h6 {
       text-decoration: none !important;
     }
 
+    .pan-divider {
+      color: $gray;
+      font-weight: 600;
+      padding: 1rem 0;
+    }
+
     .result,
     .essential-result {
       align-self: flex-start;
@@ -1324,10 +1099,11 @@ h6 {
       display: flex;
       flex-direction: row;
       font-family: 'archia';
-      font-size: .9rem;
+      font-size: 0.9rem;
       justify-content: space-between;
+      min-height: 2rem;
       padding: 1rem;
-      transition: all .2s ease-in-out;
+      transition: all 0.2s ease-in-out;
 
       &:hover {
         background: $gray-light;
@@ -1345,8 +1121,55 @@ h6 {
         background: $yellow-light;
         border-radius: 2px;
         color: $orange;
-        font-size: .75rem;
-        padding: .25rem;
+        display: flex;
+        flex-direction: row;
+        font-size: 0.75rem;
+        padding: 0.25rem;
+
+        &:hover {
+          background: $yellow-hover;
+        }
+
+        svg {
+          margin-left: 0.25rem;
+          stroke: $orange-mid;
+          stroke-width: 3px;
+        }
+
+        * {
+          align-self: center;
+        }
+      }
+
+      .result-left {
+        display: flex;
+        flex-direction: row;
+
+        * {
+          align-self: center;
+        }
+      }
+
+      .result-zone {
+        border-radius: 50%;
+        height: 0.75rem;
+        margin-left: 0.5rem;
+        width: 0.75rem;
+
+        &.is-red {
+          background: $cherry-light;
+          border: 2px solid $cherry-mid;
+        }
+
+        &.is-orange {
+          background: $orange-light;
+          border: 2px solid $orange-mid;
+        }
+
+        &.is-green {
+          background: $green-light;
+          border: 2px solid $green-mid;
+        }
       }
     }
 
@@ -1354,23 +1177,27 @@ h6 {
       display: flex;
       flex-direction: column;
 
-
       .result-top {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         width: 100%;
 
-
         .result-top-left {
           display: flex;
           flex-direction: column;
 
-
           .result-location {
             display: flex;
             flex-direction: row;
-            font-size: .75rem;
+            font-size: 0.75rem;
+          }
+
+          .result-distance {
+            color: $green;
+            display: flex;
+            flex-direction: row;
+            font-size: 0.75rem;
           }
         }
       }
@@ -1382,17 +1209,22 @@ h6 {
         color: $pink;
         display: flex;
         flex-direction: row;
-        font-size: .75rem;
+        font-size: 0.75rem;
         height: 1rem;
-        padding: .25rem;
+        padding: 0.25rem;
         text-align: right;
+        text-transform: capitalize;
+
+        &:hover {
+          background: $pink-hover;
+        }
 
         & > * {
           align-self: center;
         }
 
         svg {
-          margin-left: .25rem;
+          margin-left: 0.25rem;
           stroke-width: 3px;
           width: 12px;
         }
@@ -1400,28 +1232,46 @@ h6 {
 
       .result-description {
         align-self: flex-start;
-        font-size: .75rem;
+        font-size: 0.75rem;
+        margin-bottom: .5rem;
         margin-top: 1rem;
+      }
+
+      .result-contacts {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
       }
 
       .result-contact {
         align-self: flex-start;
         background: $gray-light;
         border-radius: 2px;
+        color: $gray;
         display: flex;
         flex-direction: row;
-        font-size: .75rem;
+        font-size: 0.75rem;
         height: 1rem;
-        margin-top: .5rem;
-        padding: .25rem;
+        margin-right: .25rem;
+        margin-top: 0.25rem;
+        padding: 0.25rem;
         text-align: right;
+
+        &:hover {
+          background: $gray-hover;
+        }
+
+        a {
+          color: inherit;
+        }
 
         & > * {
           align-self: center;
         }
 
         svg {
-          margin-right: .25rem;
+          margin-right: 0.25rem;
           stroke: $gray-mid;
           stroke-width: 3px;
           width: 12px;
@@ -1435,7 +1285,6 @@ h6 {
     flex-direction: column;
     margin-right: 1rem;
 
-
     .suggestion {
       color: $gray-mid;
       display: flex;
@@ -1448,7 +1297,7 @@ h6 {
 
       h4 {
         cursor: pointer;
-        margin-left: .25rem;
+        margin-left: 0.25rem;
         word-wrap: wrap;
 
         &:hover {
@@ -1476,10 +1325,27 @@ h6 {
     justify-content: space-around;
     padding: 1rem;
 
+    &.timeline {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      padding: 1rem;
+      position: absolute;
+      top: 13.25rem;
+
+      .highlight {
+        color: $brown !important;
+        position: absolute;
+        text-align: center;
+        top: 2.5rem;
+        width: 100%;
+      }
+    }
+
     & > * {
       align-self: center;
-      margin-left: .5rem;
-      margin-right: .5rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
     }
 
     h5 {
@@ -1499,10 +1365,33 @@ h6 {
       }
     }
 
+    .timeline-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      svg {
+        display: flex;
+        fill: #a6abb0 !important;
+        flex-direction: row;
+        justify-content: center;
+        stroke: #a6abb0 !important;
+        stroke-width: 0.5 !important;
+
+        path {
+          align-self: center;
+        }
+
+        &:hover {
+          fill: $gray !important;
+          stroke: $gray !important;
+        }
+      }
+    }
+
     .bell-icon {
       height: 24px;
       position: relative;
-
 
       .indicator {
         background: $pblue;
@@ -1517,27 +1406,29 @@ h6 {
   }
 }
 
-.last-update {
-  align-self: center;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: auto;
-  margin-top: .25rem;
-  text-align: right;
+.Timeline {
+  cursor: pointer;
+  height: 3rem;
+  width: 30rem;
+  will-change: transform;
 
-  h6 {
-    color: $green-mid;
-    font-weight: 900;
-  }
+  .day {
+    position: absolute;
+    text-align: center;
+    width: 70px;
+    will-change: transform;
 
-  h3 {
-    color: $green;
-    font-weight: 600;
-  }
+    h5 {
+      color: $gray-mid;
 
-  h3,
-  h6 {
-    margin: 0;
+      &:hover {
+        color: $gray !important;
+      }
+
+      &::selection {
+        background: transparent !important;
+      }
+    }
   }
 }
 
@@ -1550,15 +1441,15 @@ h6 {
   display: flex;
   flex-direction: row;
   font-family: 'archia';
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 900;
-  margin-bottom: .5rem;
-  margin-top: .25rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.25rem;
   outline: none;
-  padding: .5rem;
+  padding: 0.5rem;
   text-decoration: none;
   text-transform: uppercase;
-  transition: background .2s ease-in-out;
+  transition: background 0.2s ease-in-out;
 
   svg {
     padding-right: 6px;
@@ -1597,7 +1488,7 @@ h6 {
   background: $gray-light !important;
   color: #08c !important;
   justify-content: center;
-  padding-left: .65rem;
+  padding-left: 0.65rem;
   width: 15.5rem;
 
   &:hover {
@@ -1609,8 +1500,8 @@ h6 {
   background: #000 !important;
   color: #fff !important;
   justify-content: center;
-  padding-left: .65rem;
-  transition: all .2s ease-in-out;
+  padding-left: 0.65rem;
+  transition: all 0.2s ease-in-out;
   width: 15.5rem;
 
   &:hover {
@@ -1637,7 +1528,7 @@ h6 {
   flex-direction: row;
   justify-content: space-between;
   position: absolute;
-  top: 13rem;
+  top: 7rem;
   width: 30rem;
 
   .highlight {
@@ -1676,7 +1567,6 @@ h6 {
   justify-content: space-between;
   width: 30rem;
 
-
   .level-item {
     display: flex;
     flex-direction: column;
@@ -1697,14 +1587,17 @@ h6 {
   }
 
   h4 {
-    margin-bottom: -.5rem;
+    margin-bottom: -0.5rem;
   }
 
   h5 {
     font-weight: 600;
+    overflow-wrap: break-word;
+    text-align: center;
+    width: 100%;
   }
 
-  .is-cherry {
+  .is-confirmed {
     h1,
     h5 {
       color: $cherry;
@@ -1715,7 +1608,7 @@ h6 {
     }
   }
 
-  .is-blue {
+  .is-active {
     h1,
     h5 {
       color: $blue;
@@ -1726,7 +1619,7 @@ h6 {
     }
   }
 
-  .is-green {
+  .is-recovered {
     h1,
     h5 {
       color: $green;
@@ -1737,7 +1630,7 @@ h6 {
     }
   }
 
-  .is-gray {
+  .is-deceased {
     h1,
     h5 {
       color: $gray;
@@ -1769,381 +1662,254 @@ abbr {
   }
 }
 
-.table-fineprint {
-  color: $gray-mid;
-  font-weight: 600;
-  margin: 0;
-  margin-bottom: .25rem;
-  margin-right: .25rem;
-  text-align: right;
-
-  a {
-    border-bottom: 2px solid $gray-hover;
-    color: inherit;
-    text-decoration: none;
-    transition: all .2s ease-in-out;
-
-    &:hover {
-      background: $gray-hover;
-    }
-  }
-}
-
-.Table {
-  margin-bottom: 1rem;
-}
-
-table {
+.fineprint {
+  align-items: flex-end;
   align-self: center;
-  border-collapse: separate;
-  border-spacing: 3px 4px;
-  font-family: 'archia';
-  position: relative;
-  width: 30rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 28rem;
 
-  thead {
-    background: $gray-light;
-    color: $gray;
-    font-size: .75rem;
-    text-align: left;
+  .text {
+    color: $gray-mid;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
 
-    th {
-      background: $gray-light-opaque;
-      border-radius: 5px;
-      cursor: pointer;
-      padding: .5rem;
-      position: sticky !important;
-      top: 5px;
-      transition: all .1s ease-in-out;
-      z-index: 99;
+    a {
+      border-bottom: 2px solid $gray-hover;
+      color: inherit;
+      text-decoration: none;
+      transition: all 0.2s ease-in-out;
 
       &:hover {
-        background: #ecedee;
+        background: $gray-hover;
       }
     }
   }
+}
 
-  .heading-content {
+.table {
+  align-self: center;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'archia';
+  font-size: 12px;
+  margin-bottom: 2.5rem;
+  margin-top: .25rem;
+  overflow-x: auto;
+  width: 28rem;
+
+  .state-meta {
     align-items: center;
     display: flex;
     flex-direction: row;
-    height: .9rem;
     justify-content: space-between;
-    position: relative;
-
-    abbr {
-      color: $gray;
-      text-align: right;
-
-      &.is-confirmed {
-        color: $cherry;
-      }
-
-      &.is-active {
-        color: $blue;
-      }
-
-      &.is-recovered {
-        color: $green;
-      }
-
-      &.is-deaths {
-        color: $gray;
-      }
-    }
+    left: 0;
+    margin-bottom: 1 + .25rem;
+    margin-top: 1rem;
+    position: sticky;
 
     svg {
-      color: $gray-mid;
-      margin: 0;
-      margin-left: .25rem;
-      margin-top: .15rem;
-      right: 0;
-      stroke-width: 4px;
-      width: 10px;
+      margin-right: .5rem;
     }
-  }
 
-  tbody {
-    color: $gray;
+    .last-updated {
+      align-items: center;
+      color: $green;
+      display: flex;
+      flex-direction: row;
+    }
 
-    tr {
+    .state-page {
+      align-items: center;
+      background: $yellow-light;
+      border-radius: 5px;
+      color: $orange;
       cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      padding: .75rem;
 
-      &:nth-child(odd) {
-        background: $gray-light;
-      }
-
-      &.is-highlighted {
-        background: $gray-hover !important;
-      }
-
-      &.is-odd {
-        background: $gray-light !important;
-      }
-
-      &.is-total {
-        background: $gray-hover;
-      }
-
-      &.is-spacer {
-        background: transparent !important;
-
-        &:hover {
-          background: transparent !important;
-        }
+      p {
+        align-self: flex-end;
+        flex: 1;
+        margin: 0;
+        text-align: right;
       }
 
       &:hover {
-        background: $gray-hover !important;
+        background: $yellow-hover;
+      }
+    }
+  }
 
-        .dropdown {
-          background: $gray-hover;
+  .row {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    &:nth-child(odd) {
+      .cell {
+        background: $gray-light;
+      }
+    }
+
+    &.is-highlighted {
+      .cell {
+        background: $gray-hover-opaque !important;
+      }
+    }
+
+    &.heading {
+      .cell {
+        cursor: pointer;
+
+        &:hover {
+          background: $gray-hover-opaque !important;
         }
       }
     }
 
-    td {
-      border-radius: 4px;
-      font-size: .9rem;
-      padding: .25rem;
-      text-align: right;
+    &.is-total {
+      .cell {
+        background: $gray-hover-opaque !important;
+      }
+    }
 
-      &:first-child {
-        font-weight: 600;
-        max-width: 7.5rem !important;
-        text-align: left;
-        word-wrap: break-word !important;
+    .cell {
+      align-items: center;
+      border-radius: 3px;
+      color: $gray;
+      display: flex;
+      flex-direction: row;
+      margin-bottom: .25rem;
+      padding: .5rem;
+      position: relative;
+
+      &:not(:first-child) {
+        flex-basis: 3.5rem;
+        flex-grow: 1;
+        flex-shrink: 0;
+        justify-content: flex-end;
       }
 
-      .delta {
-        display: inline-block;
-        font-size: 11px !important;
+      &:first-child {
+        background: $gray-hover-darker-opaque;
+        flex-basis: 7.5rem;
+        flex-grow: 0;
+        flex-shrink: 0;
+        justify-content: space-between;
+        left: 0;
+        position: sticky;
+        z-index: 11;
 
-        svg {
-          height: 9px;
-          stroke-width: 3;
-          vertical-align: -.25px;
-          width: 9px;
+        .sort-icon {
+          left: unset;
+          right: 0;
+        }
+      }
+
+      svg {
+        color: $gray-mid;
+        stroke-width: 2.5px;
+      }
+
+      .sort-icon {
+        left: 0;
+        margin-left: .25rem;
+        margin-right: .25rem;
+        position: absolute;
+        top: 0;
+
+        &.invert {
+          margin-top: .25rem;
+          transform: rotate(180deg);
+        }
+      }
+
+      &.statistic {
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+
+        .total {
+          font-size: 14px;
         }
 
-        &.is-confirmed {
+        .is-confirmed {
           color: $cherry;
         }
 
-        &.is-active {
-          color: $blue;
-        }
-
-        &.is-recovered {
+        .is-recovered {
           color: $green;
         }
 
-        &.is-deaths {
+        .is-deceased {
           color: $gray;
         }
       }
 
-      .total {
-        margin-left: .25rem;
+      &:not(:last-child) {
+        margin-right: 0.25rem;
       }
 
-      a {
-        height: 1px;
-
-        svg {
-          align-self: center;
-          color: $gray-mid;
-          margin-left: 2px;
-          stroke-width: 3px;
-          transition: all .2s ease-in-out;
-          vertical-align: -.435rem;
-          width: 12px;
-
-          &:hover {
-            stroke: $gray;
-          }
-        }
-      }
-
-      &.is-Orange {
-        background: $yellow-light;
-        border-left: 5px solid $orange-mid;
-        color: $orange;
-
-        svg {
-          color: $orange !important;
-        }
-      }
-
-      &.is-Red {
-        background: $cherry-light;
-        border-left: 5px solid $cherry-mid;
-        color: $cherry;
-
-        svg {
-          color: $cherry !important;
-        }
-      }
-
-      &.is-Green {
-        background: $green-light;
-        border-left: 5px solid $green-mid;
-        color: $green;
-
-        svg {
-          color: $green !important;
-        }
-      }
-    }
-
-    .title-chevron {
-      position: relative;
-
-      & > * {
-        align-self: center;
-      }
-
-      .title-icon {
-        svg {
-          color: $gray-mid;
-          padding-left: 2px;
-          stroke-width: 3;
-          vertical-align: -6.5px;
-          width: 12px;
-        }
-      }
-    }
-
-    .state-last-update {
-      background: transparent !important;
-      color: $green !important;
-      height: 2rem;
-
-      p {
-        font-size: .75rem;
-        margin: 0;
-      }
-
-      &:hover {
-        background: transparent !important;
-      }
-
-      .disclaimer {
-        backdrop-filter: saturate(180%) blur(20px);
-        background: $gray-light;
-        border-radius: 5px;
-        color: $gray;
-        display: flex;
-        flex-direction: row;
-        font-family: 'archia';
-        font-size: 12px;
-        left: 0;
-        margin-top: .5rem;
-        max-width: 10rem;
-        padding: .5rem;
-
-        svg {
-          margin-right: .25rem;
-          margin-top: -.25rem;
-          stroke-width: 2px;
-          width: 20px !important;
-        }
-      }
-
-      .state-page-link {
-        background: $yellow-light !important;
-        color: $orange;
-        font-size: .75rem;
-        font-weight: 600;
-        padding: .5rem;
-        text-align: center;
+      &.heading {
+        background: $gray-light-opaque;
+        font-size: 13px;
+        font-weight: 900;
 
         &:hover {
-          background: $yellow-hover !important;
+          background: $gray-hover !important;
         }
       }
-    }
 
-    .district-heading {
-      background: $gray-light;
+      .state-name,
+      .district-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-right: .25rem;
+        width: 6rem;
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  .spacer {
+    color: $gray-mid;
+    left: 0;
+    margin-bottom: 1 + .25rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1rem;
+    position: sticky;
+    text-align: center;
+    width: 10rem;
+
+    .fold {
+      cursor: pointer;
 
       &:hover {
-        background: $gray-light !important;
-      }
-
-      td {
-        background: $gray-light;
-        color: $gray-dark;
-        font-size: .75rem;
-        font-weight: 900;
-        padding: .45rem;
-
-        .heading-content {
-          align-items: center;
-          display: flex;
-          flex-direction: row;
-          height: .9rem;
-          justify-content: space-between;
-          position: relative;
-
-          abbr {
-            text-align: right;
-          }
-
-          svg {
-            color: $gray-mid;
-            margin: 0;
-            margin-left: .25rem;
-            margin-top: .15rem;
-            right: 0;
-            stroke-width: 4px;
-            width: 10px;
-          }
-        }
+        color: $gray;
       }
     }
   }
 
-  .affected-count {
-    color: $gray-mid;
-    margin: 0;
-    position: absolute;
-    right: 0;
-    top: -1rem;
+  .intersection {
+    display: block;
   }
 
-  .unknown {
-    svg {
-      color: $gray-mid;
-      height: 12px;
-      padding-left: 2px;
-      stroke-width: 3;
-      vertical-align: -1.5px;
-      width: 12px;
-    }
-  }
+  @media (min-width: 769px) {
+    .cell {
+      &:first-child {
+        flex-basis: 3rem;
+      }
 
-  .dropdown {
-    background: $gray-light;
-    border-radius: 50%;
-    cursor: pointer;
-    height: 13px;
-    left: -1.25rem;
-    position: absolute;
-    top: .125rem;
-    transition: background .2s ease-in-out;
-    width: 13px;
-
-    &:hover {
-      background: $gray-hover;
-    }
-
-    svg {
-      left: 1px;
-      position: absolute;
-      stroke-width: 3;
-      top: -.35rem;
-      width: 11px;
+      &:not(:first-child) {
+        flex-basis: 4rem;
+      }
     }
   }
 }
@@ -2152,45 +1918,43 @@ table {
   z-index: 10;
 }
 
-.back-button {
-  z-index: 11;
-}
-
 .anchor {
   cursor: pointer;
   position: absolute;
   right: 0;
   transform: rotate(45deg);
-  transition: all .1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  z-index: 999;
 
   svg {
-    stroke: $gray-mid;
-    stroke-width: 3;
-    width: 16px;
+    color: $gray-mid;
 
     &:hover {
-      stroke: $gray;
+      color: $gray;
     }
   }
 
   &.stickied {
-    transform: rotate(0deg);
+    transform: rotate(90deg);
 
     svg {
-      stroke: $gray;
+      color: $gray;
     }
   }
 }
 
 .MapExplorer {
   align-self: center;
-  display: flex;
-  flex-direction: column;
+  position: relative;
   width: 30rem;
 
   &.stickied {
     position: sticky !important;
     top: 0;
+  }
+
+  &.hidden {
+    display: none;
   }
 
   .header {
@@ -2206,20 +1970,28 @@ table {
 
     h6 {
       margin-bottom: 2rem;
-      margin-top: .75rem;
+      margin-top: 0.75rem;
     }
   }
 
   .svg-parent {
-    display: flex;
-    flex-direction: row;
+    display: block;
     margin: auto;
     margin-top: 2rem;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
     width: 90%;
+
+    &.maplegend {
+      margin-top: 0.6rem;
+      width: 100%;
+      z-index: 1;
+    }
 
     svg {
       align-self: center;
+      height: 100%;
+      overflow: visible;
       width: 100%;
 
       text {
@@ -2232,57 +2004,52 @@ table {
     }
   }
 
-  .legend {
-    margin-top: 1em;
-    width: 100%;
-
-    svg {
-      display: block;
-      overflow: visible;
-    }
-  }
-
-  .map-hover {
-    stroke-width: 2;
-  }
-
-  .back-button {
-    background: $yellow-light;
-    color: $orange;
+  .last-update {
+    align-self: center;
+    margin-bottom: auto;
+    margin-top: 0.25rem;
     position: absolute;
     right: 0;
-    top: 2.75rem;
-    transition: all .2s ease-in-out;
+    text-align: right;
+    width: 10rem;
 
-    &:hover {
-      background: $yellow-hover;
+    h6 {
+      color: $green-mid;
+      font-weight: 900;
+    }
+
+    h3 {
+      color: $green;
+      font-weight: 600;
+    }
+
+    h3,
+    h6 {
+      margin: 0;
     }
   }
 
-  .state-page-button {
+  .map-button {
     background: $yellow-light;
     border-radius: 5px;
     color: $orange;
-    font-size: .75rem;
-    height: 1.5rem;
-    padding: .45rem;
-    padding-left: .75rem;
+    cursor: pointer;
+    font-family: 'archia';
+    font-size: 0.75rem;
+    font-weight: 900;
+    margin-bottom: 0.25rem;
+    padding: 0.5rem;
     position: absolute;
     right: 0;
-    top: -.5rem;
-    transition: all .2s ease-in-out;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
       background: $yellow-hover;
-    }
-
-    abbr {
-      text-transform: none;
     }
 
     svg {
       height: 12px;
-      margin-left: .25rem;
+      margin-left: 0.25rem;
       stroke: $orange-mid;
       stroke-width: 3px;
       vertical-align: middle;
@@ -2291,18 +2058,19 @@ table {
   }
 
   .meta {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
     height: 4rem;
     justify-content: space-between;
+    position: relative;
 
     h2 {
-      color: #e23028;
       font-weight: 900;
       margin-top: 0;
       width: calc(100% - 10rem);
       word-wrap: break-word;
+
+      &.confirmed {
+        color: $brick;
+      }
 
       &.active {
         color: $blue;
@@ -2314,6 +2082,10 @@ table {
 
       &.deceased {
         color: $gray;
+      }
+
+      &.tested {
+        color: $purple;
       }
 
       &.Red {
@@ -2340,13 +2112,16 @@ table {
     }
 
     .district {
-      color: #e23028;
       line-height: 15px;
       margin: 0;
 
       span {
-        font-size: .75rem;
+        font-size: 0.75rem;
         font-weight: 600;
+      }
+
+      &.confirmed {
+        color: $brick;
       }
 
       &.active {
@@ -2360,15 +2135,10 @@ table {
       &.deceased {
         color: $gray;
       }
-    }
 
-    .unknown {
-      font-weight: 600;
-      position: absolute;
-      right: 0;
-      text-align: right;
-      top: 5.5rem;
-      width: 5rem;
+      &.tested {
+        color: $purple;
+      }
     }
   }
 
@@ -2394,20 +2164,17 @@ table {
     }
 
     .stats {
-      background: $cherry-light;
       border-radius: 5px;
-      color: $cherry-mid;
       cursor: pointer;
       display: flex;
       flex: 1;
       flex-direction: column;
-      height: 3rem;
       margin-bottom: 1rem;
-      margin-left: .25rem;
-      margin-right: .25rem;
-      padding: .25rem;
+      margin-left: 0.25rem;
+      margin-right: 0.25rem;
+      padding: 0.25rem;
       position: relative;
-      transition: all .1s ease-in-out;
+      transition: all 0.1s ease-in-out;
 
       .stats-bottom {
         display: flex;
@@ -2415,18 +2182,30 @@ table {
 
         h6 {
           font-weight: 900;
-          margin-bottom: .25rem;
+          margin-bottom: 0.25rem;
           margin-top: auto;
         }
       }
 
       h1 {
-        color: $cherry;
         font-size: 1em !important;
         font-weight: 600;
       }
 
-      &.is-green {
+      &.confirmed {
+        background: $cherry-light;
+
+        h5,
+        h6 {
+          color: $cherry-mid;
+        }
+
+        h1 {
+          color: $cherry;
+        }
+      }
+
+      &.recovered {
         background: $green-light;
 
         h5,
@@ -2439,7 +2218,7 @@ table {
         }
       }
 
-      &.is-blue {
+      &.active {
         background: $blue-light;
 
         h5,
@@ -2452,7 +2231,7 @@ table {
         }
       }
 
-      &.is-gray {
+      &.deceased {
         background: $gray-light;
 
         h5,
@@ -2465,20 +2244,7 @@ table {
         }
       }
 
-      &.is-yellow {
-        background: $yellow;
-
-        h5,
-        h6 {
-          color: $white;
-        }
-
-        h1 {
-          color: $white;
-        }
-      }
-
-      &.is-purple {
+      &.tested {
         background: $purple-light;
         padding-right: 1rem;
 
@@ -2499,31 +2265,37 @@ table {
         svg {
           cursor: pointer;
           position: absolute;
-          right: .35rem;
+          right: 0.35rem;
           stroke: $purple-mid;
           stroke-width: 3;
           top: 0;
-          transition: stroke .2s ease-in-out;
+          transition: stroke 0.2s ease-in-out;
           width: 12px;
 
           &:hover {
             stroke: $purple;
           }
         }
+      }
 
-        .tooltip-tested {
-          svg {
-            bottom: .3rem;
-            top: auto;
-          }
+      &.is-yellow {
+        background: $yellow;
+
+        h5,
+        h6 {
+          color: $white;
+        }
+
+        h1 {
+          color: $white;
         }
       }
 
       &.focused {
-        margin-bottom: .5rem;
-        margin-top: -.5rem;
-        padding-bottom: .75rem;
-        padding-top: .75rem;
+        margin-bottom: 0.5rem;
+        margin-top: -0.5rem;
+        padding-bottom: 0.75rem;
+        padding-top: 0.75rem;
       }
 
       &:first-child {
@@ -2554,7 +2326,7 @@ table {
     left: 0;
     margin-left: auto;
     margin-right: auto;
-    padding: .5rem;
+    padding: 0.5rem;
     pointer-events: none;
     position: absolute;
     right: 0;
@@ -2562,39 +2334,29 @@ table {
     z-index: 99;
 
     svg {
-      margin-right: .25rem;
-      margin-top: -.9rem;
+      margin-right: 0.25rem;
+      margin-top: -0.9rem;
+      position: relative !important;
       stroke-width: 2px;
-      width: 20px !important;
+      width: 20px;
     }
   }
 
   .footnote {
-    &.table-fineprint {
-      margin-bottom: 0;
-      margin-top: 1em;
-      text-align: left;
+    color: $gray;
+    margin-bottom: 0;
+    margin-top: 1em;
+    text-align: left;
+    z-index: 1;
+
+    a {
+      border-bottom: 2px solid $gray-hover;
+      text-decoration: none;
+
+      &:hover {
+        background: $gray-hover;
+      }
     }
-  }
-}
-
-.__react_component_tooltip {
-  font-family: 'archia';
-  font-size: 11px;
-  font-weight: 600;
-  padding: .25rem;
-  text-align: center;
-  width: 200px;
-}
-
-.tooltip-tested {
-  pointer-events: all;
-
-  svg {
-    cursor: pointer;
-    height: .95em;
-    stroke-width: 3;
-    width: 1em;
   }
 }
 
@@ -2602,8 +2364,6 @@ table {
   display: flex;
   flex-direction: row;
   position: relative;
-  z-index: 99;
-
 
   .tab {
     background: $gray-light;
@@ -2612,12 +2372,12 @@ table {
     color: $gray-mid;
     cursor: pointer;
     height: 3.25rem;
-    margin-right: .25rem;
+    margin-right: 0.25rem;
     min-width: 5rem;
     padding-left: 1rem;
     padding-right: 1rem;
     text-align: center;
-    transition: all .3s ease-in-out;
+    transition: all 0.3s ease-in-out;
 
     &:hover {
       background: $gray-hover;
@@ -2633,7 +2393,7 @@ table {
 .tabs-map {
   display: flex;
   flex-direction: row;
-  margin-top: .5rem;
+  flex-wrap: wrap;
   position: relative;
   z-index: 99;
 
@@ -2657,12 +2417,13 @@ table {
     color: $gray-mid;
     cursor: pointer;
     height: 2rem;
-    margin-right: .25rem;
-    min-width: 2rem;
+    margin-right: 0.25rem;
+    margin-top: 0.25rem;
+    min-width: 1.6rem;
     padding-left: 1rem;
     padding-right: 1rem;
     text-align: center;
-    transition: all .3s ease-in-out;
+    transition: all 0.3s ease-in-out;
 
     &:hover {
       background: $gray-hover;
@@ -2671,7 +2432,6 @@ table {
     &.focused {
       background: $gray-opaque;
       color: $gray;
-
     }
 
     &.disabled {
@@ -2682,13 +2442,16 @@ table {
 
   sup {
     position: relative;
-    top: -.5em;
+    top: -0.5em;
     vertical-align: top;
   }
 }
 
 .TimeSeriesExplorer {
   align-self: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3rem;
   width: 30rem;
 
   &.stickied {
@@ -2697,28 +2460,9 @@ table {
   }
 
   .alert {
-    margin-bottom: .5rem;
-    margin-left: auto;
-    margin-right: 0;
-    margin-top: .5rem;
-    padding: .25rem;
-    padding-left: .5rem;
-    padding-right: .5rem;
-    width: 16rem;
-
-    & > * {
-      align-self: center;
-    }
-
-    svg {
-      margin: 0 !important;
-      margin-right: .25rem !important;
-      width: 14px !important;
-    }
-
-    .alert-right {
-      width: 100%;
-    }
+    align-self: flex-end;
+    margin: 0;
+    margin-top: 1rem;
   }
 }
 
@@ -2734,7 +2478,7 @@ table {
 
 .timeseries-header {
   align-self: center;
-  margin-top: 3rem;
+  position: relative;
   width: 100%;
 
   h1 {
@@ -2757,10 +2501,10 @@ table {
     label {
       color: $gray-mid;
       font-family: 'archia';
-      font-size: .75rem;
+      font-size: 0.75rem;
       font-weight: 900;
-      margin-right: .25rem;
-      transition: all .2s ease-in-out;
+      margin-right: 0.25rem;
+      transition: all 0.2s ease-in-out;
       z-index: 99;
     }
 
@@ -2860,7 +2604,7 @@ input {
     font-weight: 900;
     margin-left: -1px;
     margin-top: 1rem;
-    padding: .5rem;
+    padding: 0.5rem;
     width: auto;
 
     &:focus {
@@ -2880,18 +2624,18 @@ input {
     border-radius: 3px;
     display: flex;
     flex-direction: column;
-    left: .5rem;
-    padding: .25rem;
+    left: 0.5rem;
+    padding: 0.25rem;
     pointer-events: none;
     position: absolute;
-    top: .5rem;
+    top: 0.5rem;
 
     h2,
     h5,
     h6 {
       color: $cherry-mid;
       margin: 0;
-      transition: all .15s ease-in-out;
+      transition: all 0.15s ease-in-out;
     }
 
     h5 {
@@ -2910,8 +2654,8 @@ input {
       flex-direction: row;
 
       h6 {
-        margin-bottom: .1rem;
-        margin-left: .25rem;
+        margin-bottom: 0.1rem;
+        margin-left: 0.25rem;
       }
 
       & > * {
@@ -2919,7 +2663,7 @@ input {
       }
     }
 
-    &.is-green {
+    &.is-recovered {
       h5 {
         color: $green-mid;
 
@@ -2934,7 +2678,7 @@ input {
       }
     }
 
-    &.is-gray {
+    &.is-deceased {
       h5 {
         color: $gray-mid;
 
@@ -2949,7 +2693,7 @@ input {
       }
     }
 
-    &.is-blue {
+    &.is-active {
       h5 {
         color: $blue-mid;
 
@@ -2964,7 +2708,7 @@ input {
       }
     }
 
-    &.is-purple {
+    &.is-tested {
       h5 {
         color: $purple-mid;
 
@@ -2976,12 +2720,6 @@ input {
       h2,
       h6 {
         color: $purple;
-      }
-
-      .tooltip-tested {
-        svg {
-          width: 1em;
-        }
       }
     }
   }
@@ -3013,7 +2751,7 @@ input {
       }
     }
 
-    &.is-green {
+    &.is-recovered {
       background: $green-light;
 
       svg {
@@ -3030,7 +2768,7 @@ input {
       }
     }
 
-    &.is-gray {
+    &.is-deceased {
       background: $gray-light;
 
       svg {
@@ -3047,7 +2785,7 @@ input {
       }
     }
 
-    &.is-blue {
+    &.is-active {
       background: $blue-light;
 
       svg {
@@ -3064,7 +2802,7 @@ input {
       }
     }
 
-    &.is-purple {
+    &.is-tested {
       background: $purple-light;
 
       svg {
@@ -3097,12 +2835,6 @@ input {
     background: transparent !important;
     width: calc(25%);
   }
-
-  .tooltip {
-    position: fixed;
-    right: 0;
-    top: 0;
-  }
 }
 
 .floating-buttons {
@@ -3124,10 +2856,10 @@ input {
     cursor: pointer;
     display: flex;
     flex-direction: row;
-    margin: .25rem;
+    margin: 0.25rem;
     outline: none;
-    padding: .75rem;
-    transition: all .2s ease-in-out;
+    padding: 0.75rem;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
       background: #ffa500;
@@ -3163,7 +2895,7 @@ input {
     font-weight: 900;
     text-decoration: none;
     text-transform: uppercase;
-    transition: background .2s ease-in-out;
+    transition: background 0.2s ease-in-out;
     word-wrap: break-word;
 
     &:hover {
@@ -3192,8 +2924,9 @@ footer {
 
   h5 {
     color: $gray;
+    font-weight: 600;
     margin: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
     margin-top: 1rem;
   }
 
@@ -3244,9 +2977,8 @@ footer {
     justify-content: space-between;
     width: calc(100% - 0);
 
-
     .link {
-      margin-right: -.75rem;
+      margin-right: -0.75rem;
       width: 12rem;
     }
 
@@ -3255,9 +2987,9 @@ footer {
     }
 
     img {
-      margin-bottom: .25rem;
+      margin-bottom: 0.25rem;
       margin-left: 1rem;
-      margin-right: .25rem;
+      margin-right: 0.25rem;
     }
 
     h5 {
@@ -3301,7 +3033,7 @@ footer {
   .question {
     color: $gray-dark;
     margin: 0;
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
   }
 
   .answer {
@@ -3320,13 +3052,12 @@ footer {
   }
 }
 
-.PatientsDB {
+.Demographics {
   align-self: center;
   display: flex;
   flex-direction: column;
-  margin-left: auto;
-  margin-right: auto;
-
+  margin-left: 6rem;
+  width: calc(100% - 6rem);
 
   .select {
     display: flex;
@@ -3344,8 +3075,8 @@ footer {
       font-size: 12px;
       font-weight: 900;
       height: 2.19rem;
-      margin: .2rem .1rem;
-      padding: .5rem;
+      margin: 0.2rem 0.1rem;
+      padding: 0.5rem;
       padding-inline-start: 1px;
       width: auto;
 
@@ -3373,7 +3104,7 @@ footer {
         border-radius: 5px;
         font-family: 'archia';
         padding: 1rem;
-        transition: all .1s ease-in-out;
+        transition: all 0.1s ease-in-out;
 
         &:disabled {
           border-radius: 0 !important;
@@ -3413,7 +3144,7 @@ footer {
 
     .react-calendar__month-view__weekdays__weekday {
       font-family: 'archia';
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     .react-calendar__month-view__days__day--weekend,
@@ -3449,7 +3180,7 @@ footer {
 
     .react-date-picker__calendar-button {
       margin: 0 !important;
-      margin-left: .25rem !important;
+      margin-left: 0.25rem !important;
       padding: 0 !important;
 
       svg {
@@ -3474,8 +3205,8 @@ footer {
       cursor: pointer;
       font-family: 'archia';
       font-weight: 900;
-      margin: .2rem .1rem;
-      padding: .5rem;
+      margin: 0.2rem 0.1rem;
+      padding: 0.5rem;
       width: 130px;
 
       &:focus {
@@ -3490,7 +3221,7 @@ footer {
     border-radius: 5px;
     color: $pblue;
     font-family: 'archia';
-    font-size: .9rem;
+    font-size: 0.9rem;
     font-weight: 600;
     line-height: 23px;
     margin-bottom: 3rem;
@@ -3503,12 +3234,12 @@ footer {
 
     svg {
       cursor: pointer;
-      padding: .5rem;
+      padding: 0.5rem;
       position: absolute;
       right: 0;
       stroke: $pblue-mid;
       stroke-width: 3px;
-      top: -.25rem;
+      top: -0.25rem;
       width: 16px;
 
       &:hover {
@@ -3563,7 +3294,6 @@ footer {
     justify-content: center;
     padding-left: 5rem;
     padding-right: 5rem;
-
 
     .no-result {
       align-self: center;
@@ -3621,8 +3351,8 @@ footer {
     flex-direction: row;
     height: 3.25rem;
     justify-content: center;
-    margin: .25rem;
-    transition: background .3s ease-in-out;
+    margin: 0.25rem;
+    transition: background 0.3s ease-in-out;
     width: 3.25rem;
 
     & > * {
@@ -3960,7 +3690,6 @@ footer {
   width: 100vw;
   z-index: 9999;
 
-
   .modal-content {
     align-self: center;
     background: #fff;
@@ -3975,7 +3704,7 @@ footer {
     svg {
       stroke: $pblue-mid;
       stroke-width: 3;
-      transition: all .1s ease-in-out;
+      transition: all 0.1s ease-in-out;
       width: 20px;
 
       &:hover {
@@ -4001,7 +3730,7 @@ footer {
 
     h3 {
       color: $pblue;
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     h5 {
@@ -4023,7 +3752,7 @@ footer {
           cursor: pointer;
           text-decoration: underline;
           text-decoration-style: dotted;
-          transition: all .1s ease-in-out;
+          transition: all 0.1s ease-in-out;
           width: 2rem;
 
           &:hover {
@@ -4050,13 +3779,13 @@ footer {
 
     .link {
       margin: 0;
-      margin-bottom: .5rem;
-      margin-top: .25rem;
+      margin-bottom: 0.5rem;
+      margin-top: 0.25rem;
 
       a {
         background: $pblue-light;
         color: $pblue;
-        transition: background .2s ease-in-out;
+        transition: background 0.2s ease-in-out;
 
         &:hover {
           background: $pblue-hover;
@@ -4070,14 +3799,13 @@ footer {
   align-self: center;
   width: 30rem;
 
-
   .Patients {
     min-height: 5rem;
   }
 
   h1 {
     color: $gray-dark;
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
   }
 
   h6 {
@@ -4144,7 +3872,7 @@ footer {
   .legend {
     justify-content: flex-start;
     padding: 1rem;
-    padding-bottom: .25rem;
+    padding-bottom: 0.25rem;
     padding-left: 0;
   }
 }
@@ -4155,9 +3883,9 @@ footer {
 
   label {
     color: $gray-mid;
-    font-size: .75rem;
+    font-size: 0.75rem;
     font-weight: 900;
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
     text-transform: uppercase;
   }
 }
@@ -4165,13 +3893,13 @@ footer {
 .filters {
   background: #fff !important;
   border-radius: 5px;
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .12), inset 0 -1px 0 0 #dadce0;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12), inset 0 -1px 0 0 #dadce0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   font-family: archia;
   justify-content: space-between;
-  padding: .5rem;
+  padding: 0.5rem;
   position: sticky;
   top: 0;
   z-index: 101;
@@ -4199,12 +3927,13 @@ footer {
     color: $orange;
     cursor: pointer;
     font-family: 'archia';
-    font-weight: 900;
+    font-size: 10px !important;
+    font-weight: 600;
     margin: 0;
     outline: none;
     padding: 10px 15px;
     text-align: center;
-    transition: background .25s ease-in-out;
+    transition: background 0.25s ease-in-out;
 
     &:hover {
       background: $yellow-hover;
@@ -4258,7 +3987,7 @@ footer {
   h5 {
     color: $gray;
     margin: 0;
-    margin-right: .5rem;
+    margin-right: 0.5rem;
 
     &.is-female {
       color: $pink;
@@ -4280,9 +4009,9 @@ footer {
   .circle {
     background: $gray-mid;
     border-radius: 50%;
-    height: .8rem;
-    margin-right: .25rem;
-    width: .8rem;
+    height: 0.8rem;
+    margin-right: 0.25rem;
+    width: 0.8rem;
 
     &.is-female {
       background: $pink;
@@ -4366,13 +4095,12 @@ footer {
   min-height: 22rem !important;
   width: 100%;
 
-
   .update {
     background: $gray-light;
     border-radius: 5px;
-    margin-bottom: .5rem;
-    padding: .75rem;
-    transition: all .2s ease-in-out;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
       background: $gray-hover;
@@ -4385,7 +4113,7 @@ footer {
 
     h5 {
       color: $gray-mid;
-      margin-bottom: .15rem;
+      margin-bottom: 0.15rem;
     }
 
     h4 {
@@ -4430,7 +4158,7 @@ footer {
 
   h2 {
     font-weight: 900;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 
     &.confirmed {
       color: $red;
@@ -4460,7 +4188,7 @@ footer {
       font-weight: 600;
       height: 2.5rem;
       justify-content: center;
-      margin-top: .75rem;
+      margin-top: 0.75rem;
       text-transform: unset;
       width: 5rem;
 
@@ -4483,6 +4211,8 @@ footer {
     }
 
     .DeltaBarGraph {
+      margin-top: 1rem;
+
       svg {
         width: 100%;
 
@@ -4490,13 +4220,10 @@ footer {
           font-family: 'archia';
         }
 
-        .delta {
-          fill: #dc3545;
+        .label {
+          font-size: 11px;
           font-weight: 900;
-        }
-
-        .percent {
-          fill: #dc354590;
+          text-anchor: middle;
         }
       }
     }
@@ -4511,8 +4238,8 @@ footer {
     &.is-grid {
       display: grid;
       grid-auto-flow: column;
-      grid-gap: .5rem;
-      padding-bottom: .5rem;
+      grid-gap: 0.5rem;
+      padding-bottom: 0.5rem;
     }
 
     .district {
@@ -4533,8 +4260,8 @@ footer {
       h5 {
         display: inline-block !important;
         flex: 0 1;
-        margin-left: .5rem;
-        margin-top: .15rem;
+        margin-left: 0.5rem;
+        margin-top: 0.15rem;
         width: auto !important;
       }
 
@@ -4545,7 +4272,7 @@ footer {
       .delta {
         display: flex;
         flex-direction: row;
-        margin-left: .5rem;
+        margin-left: 0.5rem;
         margin-top: 4px;
 
         h6 {
@@ -4598,38 +4325,94 @@ footer {
   }
 }
 
-.Clusters {
+.LanguageSwitcher {
   align-self: center;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 5rem;
+  width: 30rem;
 
-  h1 {
-    color: $red;
-    margin-bottom: 0;
-    padding-left: 1.5rem;
-    width: 100%;
+  h3 {
+    align-self: center;
+    color: $pblue;
+    font-weight: 600;
+    margin-bottom: 2rem;
   }
 
-  canvas {
-    touch-action: auto !important;
+  .close-button {
+    align-self: center;
+    background: $pblue-light;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 1rem;
+    justify-content: center;
+    padding: 1rem;
+    width: 1rem;
+
+    &:hover {
+      background: $pblue-hover;
+    }
+
+    svg {
+      color: $pblue-mid;
+      stroke-width: 2.5px;
+
+      &:hover {
+        color: $pblue;
+      }
+    }
   }
+
+  .languages {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+
+    .language {
+      border-radius: 5px;
+      color: $pblue-mid;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      font-family: 'archia';
+      font-weight: 600;
+      justify-content: center;
+      padding: 1rem;
+      user-select: none;
+
+      &:hover {
+        color: $pblue;
+      }
+
+      &.is-highlighted {
+        background: $pblue-light;
+        color: $pblue;
+      }
+    }
+  }
+}
+
+.SunMoon {
+  cursor: pointer;
 }
 
 .cards-container {
   margin-left: 5rem;
   padding: 2rem;
 
-
   .cards {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 
-
     .card {
       flex: 0 1 calc(33% - 1em);
       height: 30rem;
       margin-bottom: 2em;
-
 
       .charts-header {
         align-items: center;
@@ -4637,7 +4420,6 @@ footer {
         flex-direction: column;
         height: 100%;
         justify-content: flex-start;
-
 
         .chart-title {
           color: #6c757d;
@@ -4656,7 +4438,7 @@ footer {
         .chart-note {
           color: $gray;
           font-family: 'archia';
-          font-size: .8rem;
+          font-size: 0.8rem;
           height: 50px;
           margin-top: 5px;
         }
@@ -4667,6 +4449,33 @@ footer {
   @media (max-width: 769px) {
     margin-left: unset;
     padding: 1rem;
+  }
+}
+
+.Tooltip {
+  display: flex;
+  flex-direction: column;
+
+  .message {
+    background: #000;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    font-size: 13px;
+    font-weight: 400;
+    justify-content: flex-end;
+    max-width: 30vw;
+    min-width: 10rem;
+    padding: .5rem;
+    pointer-events: none;
+    right: 0;
+    top: 0;
+    transform: translate3d(2rem, 0, 0);
+
+    p {
+      color: $white !important;
+      margin: 0;
+    }
   }
 }
 
@@ -4683,30 +4492,22 @@ footer {
     justify-content: flex-start;
     min-width: 5rem;
     position: fixed;
-    z-index: 99999;
-
+    z-index: 999;
 
     .navbar-left {
+      margin-bottom: .5rem;
       margin-top: auto;
       order: 3;
-      padding-left: 0;
-      padding-right: 0;
       text-align: center;
-      transition: all .2s ease-in-out;
-      width: 5rem;
-
-      &:hover {
-        background: $gray-hover;
-      }
     }
 
     .navbar-middle {
-      font-size: .6rem;
+      font-size: 0.6rem;
       order: 1;
       padding-bottom: 2rem;
       padding-top: 2rem;
       text-align: center;
-      width: 2.9rem;
+      width: 46px;
       word-wrap: break-word;
     }
 
@@ -4717,10 +4518,6 @@ footer {
       order: 2;
       padding-bottom: 0;
       padding-top: 0;
-
-      &:hover {
-        background: $gray-light-opaque !important;
-      }
 
       & > span {
         display: flex;
@@ -4738,17 +4535,15 @@ footer {
 
     .expand {
       background: $gray-light-opaque;
-      border-right: solid 2px $gray-light-opaque;
       flex-direction: column;
+      height: calc(100% - 5.5rem);
       padding-left: 0;
-      padding-top: 5.5rem;
+      padding-top: 5.75rem;
       top: 0;
       width: 15rem;
-      z-index: -1 !important;
 
       & > * {
         border: 0;
-        border-left: 1px solid $gray-light;
         color: $gray;
         font-weight: 600;
         height: 1.5rem;
@@ -4757,16 +4552,9 @@ footer {
     }
   }
 
-  .PatientsDB {
-    margin-left: 5rem;
-  }
-
   .dark-mode {
     .Navbar,
-    .expand {
-      background: #1e1e30 !important;
-    }
-
+    .expand,
     .navbar-right {
       background: #1e1e30 !important;
     }
@@ -4774,7 +4562,8 @@ footer {
 }
 
 @media (max-width: 769px) {
-  table,
+  .table,
+  .fineprint,
   .header,
   .Level,
   .TimeSeriesExplorer,
@@ -4787,16 +4576,20 @@ footer {
   .updates,
   .map-switcher,
   .updates-header,
-  .StateMeta {
+  .StateMeta,
+  .Essentials,
+  .timeline,
+  .LanguageSwitcher {
     width: calc(100% - 2rem);
   }
 
   .Home,
-  .State {
+  .State, {
     display: flex;
     flex-direction: column;
     margin-left: 0;
     margin-right: 0;
+    padding-top: 1rem;
     width: 100%;
 
     .home-left,
@@ -4807,6 +4600,12 @@ footer {
       flex-direction: column;
       margin: 0;
       width: 100%;
+    }
+  }
+
+  .Level {
+    h1 {
+      font-size: 5vw !important;
     }
   }
 
@@ -4845,10 +4644,6 @@ footer {
     }
   }
 
-  .last-update {
-    width: 10rem;
-  }
-
   a {
     &.button {
       display: flex;
@@ -4869,7 +4664,6 @@ footer {
   .Banner {
     height: 7rem;
 
-
     .snippet {
       margin-left: 1rem;
       margin-right: 1rem;
@@ -4877,15 +4671,8 @@ footer {
     }
   }
 
-  table {
-    td {
-      max-width: 6.75rem;
-    }
-  }
-
   .cards-container {
     padding: .5rem;
-
 
     .cards {
       .card {
@@ -4904,7 +4691,8 @@ footer {
     }
   }
 
-  .PatientsDB {
+  .Demographics {
+    margin-left: 0;
     width: 100%;
 
     .select {
@@ -4935,7 +4723,6 @@ footer {
       .modal-content {
         width: calc(100% - 5rem);
 
-
         .meta {
           height: 20rem;
         }
@@ -4948,24 +4735,19 @@ footer {
     }
 
     .filters {
+      align-self: center;
       height: auto;
       justify-content: center;
-      padding: .5rem;
+      padding: 0.5rem;
     }
-  }
-
-  .table-fineprint {
-    margin-right: 1.25rem;
   }
 
   .patients-summary {
     width: calc(100% - 2rem);
 
-
     .modal {
       .modal-content {
         width: calc(100% - 5rem);
-
 
         .meta {
           height: 20rem;
@@ -4978,7 +4760,6 @@ footer {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
 
-
     .Patients {
       width: 100%;
     }
@@ -4990,267 +4771,18 @@ footer {
   }
 
   &.nationality {
-    margin-bottom: .5rem;
-  }
-
-  .Resources {
-    margin: 1rem;
-
-    table {
-      align-self: center;
-      border-collapse: separate;
-      border-spacing: 3px 2px;
-      font-family: 'archia';
-      position: relative;
-      text-transform: none;
-      width: 40rem;
-
-      thead {
-        background: $purple-light;
-        color: $gray-dark;
-        font-size: .7rem;
-        text-align: center;
-
-        th {
-          border-radius: 5px;
-          cursor: pointer;
-          padding: .5rem;
-          transition: all .1s ease-in-out;
-          z-index: 99;
-
-          &.sticky {
-            background: $gray-opaque;
-            top: 4px;
-          }
-
-          &:hover {
-            background: #ecedee;
-          }
-
-          .heading-content {
-            align-items: center;
-            display: flex;
-            flex-direction: row;
-            height: .9rem;
-            justify-content: space-between;
-            position: relative;
-
-            abbr {
-              text-align: right;
-            }
-
-            svg {
-              color: $gray-mid;
-              margin: 0;
-              margin-left: .25rem;
-              margin-top: .15rem;
-              right: 0;
-              stroke-width: 4px;
-              width: 10px;
-            }
-          }
-        }
-      }
-
-      tbody {
-        color: $gray;
-        max-width: 10rem;
-
-        tr {
-          transition: background .1s ease-in-out;
-
-          &:hover {
-            background: $gray-hover !important;
-          }
-
-          &.divider {
-            background: #6c757d10 !important;
-            height: .5rem;
-          }
-
-          &.spacer {
-            background: #fff !important;
-            height: .5rem;
-          }
-
-          &:nth-child(even) {
-            background-color: $purple-light;
-          }
-        }
-
-        td {
-          border-radius: 5px;
-          font-size: .6rem;
-          text-align: left;
-
-          &:first-child {
-            max-width: 7.5rem;
-            text-align: left;
-            word-wrap: break-word;
-          }
-
-          .deltas {
-            font-size: 11px !important;
-            margin-right: .25rem;
-
-            svg {
-              height: 9px;
-              stroke-width: 3;
-              vertical-align: -.25px;
-              width: 9px;
-            }
-          }
-        }
-
-        .state-last-update {
-          background: transparent;
-
-          &:hover {
-            background: #fff !important;
-          }
-
-          td {
-            .last-update {
-              align-items: baseline;
-              display: flex;
-              flex-direction: row;
-              text-align: left;
-              width: 100%;
-            }
-          }
-        }
-
-        .district-heading {
-          background: $gray-light;
-
-          td {
-            background: $gray-light;
-            color: $gray-dark;
-            font-size: .75rem;
-            font-weight: 900;
-            padding: .45rem;
-
-
-            .heading-content {
-              align-items: center;
-              display: flex;
-              flex-direction: row;
-              height: .9rem;
-              justify-content: space-between;
-              position: relative;
-
-              abbr {
-                text-align: right;
-              }
-
-              svg {
-                color: $gray-mid;
-                margin: 0;
-                margin-left: .25rem;
-                margin-top: .15rem;
-                right: 0;
-                stroke-width: 4px;
-                width: 10px;
-              }
-            }
-          }
-        }
-      }
-
-      .affected-count {
-        color: $gray-mid;
-        margin: 0;
-        position: absolute;
-        right: 0;
-        top: -1rem;
-      }
-
-      .is-total {
-        td {
-          background: $gray-hover;
-        }
-      }
-
-      .dropdown {
-        background: $gray-light;
-        border-radius: 50%;
-        cursor: pointer;
-        height: 13px;
-        left: -.75rem;
-        margin-top: .5rem;
-        position: absolute;
-        transition: background .2s ease-in-out;
-        width: 13px;
-
-        &:hover {
-          background: $gray-hover;
-        }
-
-        svg {
-          left: 1px;
-          position: absolute;
-          stroke-width: 3;
-          top: -.35rem;
-          width: 11px;
-        }
-      }
-    }
-  }
-
-  .resourcefilters {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .resourcefilter {
-    margin-bottom: .4rem;
-  }
-
-  .filtersection {
-    animation-duration: 1s;
-    animation-name: fadeInUp;
-    animation-timing-function: ease-in;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: .1rem;
-    width: 100%;
-
-    .filtertitle {
-      align-self: center;
-      color: $cherry;
-      text-align: center;
-    }
-  }
-
-  .pagination {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-
-    .select {
-      margin-right: 0;
-      margin-top: .4rem;
-    }
-
-    input {
-      margin: .1rem;
-    }
-
-    h5 {
-      margin-bottom: .1rem;
-      margin-top: 0;
-    }
+    margin-bottom: 0.5rem;
   }
 
   .Navbar {
     .expand {
-      height: calc(100vh - 3.9rem);
+      height: calc(100% - 4rem);
       overflow: auto;
       transform: none !important;
+    }
+
+    .expand-bottom {
+      margin-top: auto;
     }
 
     .navbar-right {
@@ -5271,9 +4803,7 @@ footer {
   }
 
   .State {
-    .district-bar,
-    .to-essentials,
-    .Clusters {
+    .district-bar {
       width: calc(100% - 3rem);
 
       h1 {
@@ -5292,6 +4822,25 @@ footer {
       min-width: 1rem;
     }
   }
+
+  .Essentials {
+    .alert {
+      width: 15rem !important;
+    }
+  }
+
+  .timeline {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .Timeline {
+    width: 100%;
+  }
+
+  .LanguageSwitcher {
+    margin-left: 0;
+  }
 }
 
 // Dark Mode
@@ -5299,8 +4848,6 @@ footer {
 .dark-mode {
   background: #161625 !important;
   color: #bdbdbd;
-  transition: background-color .2s ease-out !important;
-
 
   .switch-wrapper > div {
     background: #161625 !important;
@@ -5314,35 +4861,27 @@ footer {
   .expand {
     border-right: 0;
 
-
     .navbar-middle {
       color: #bdbdbd;
     }
-
-    .navbar-right {
-      background: #1e1e30 !important;
-    }
   }
 
-  table {
-    th {
-      background: #1e1e30 !important;
+  .table {
+    .cell {
+      &:first-child {
+        background: #1e1e30 !important;
+      }
+
+      &.heading {
+        background: #1e1e30 !important;
+      }
     }
 
-    .is-odd {
-      background: #1e1e30 !important;
-    }
-
-    .state-page-link {
-      background: #161625 !important;
-    }
-
-    .heading-content {
-      color: #bdbdbd !important;
-    }
-
-    .spacer {
-      background: #161625 !important;
+    .is-highlighted,
+    .is-total {
+      .cell {
+        background: #1e1e30 !important;
+      }
     }
   }
 
@@ -5376,7 +4915,6 @@ footer {
         }
 
         li {
-
           a {
             color: $gray !important;
 
@@ -5384,7 +4922,6 @@ footer {
               color: $white !important;
             }
           }
-
         }
       }
     }
@@ -5402,12 +4939,26 @@ footer {
       }
     }
 
-    .legend {
+    .maplegend {
       background: #161625 !important;
     }
 
+    .meta {
+      h1 {
+        &.tested {
+          color: #9673b9 !important;
+        }
+      }
+
+      h2 {
+        &.tested {
+          color: #9673b9 !important;
+        }
+      }
+    }
+
     .stats {
-      &.is-purple {
+      &.tested {
         background: #40008050 !important;
 
         h1 {
@@ -5437,7 +4988,7 @@ footer {
   .TimeSeries,
   .Minigraph {
     .stats {
-      &.is-purple {
+      &.is-tested {
         h5 {
           color: #9673b9bb !important;
 
@@ -5454,19 +5005,17 @@ footer {
     }
 
     .svg-parent {
-      &.is-purple {
+      &.is-tested {
         background: #40008050 !important;
 
         svg {
-          .dot,
-          .focus,
+          circle,
           .domain,
           .tick {
             stroke: #9673b9 !important;
           }
 
-          .dot,
-          .focus {
+          circle {
             fill: #9673b9 !important;
           }
 
@@ -5551,7 +5100,7 @@ footer {
       &.switch {
         background: $dark !important;
         border: $gray-light 2px solid !important;
-        opacity: .7;
+        opacity: 0.7;
 
         &::after {
           background: $gray !important;
@@ -5576,119 +5125,10 @@ footer {
     }
   }
 
-  .Resources {
-    .filtersection {
-      .disclaimercontainer {
-        .mobile-disclaimer-button {
-          background-color: $dark-m-white;
-          color: #808080;
-        }
-
-        .disclaimer-button {
-          background: none;
-          color: $dark-mid-subtext;
-        }
-
-        .MuiSvgIcon-root {
-          fill: $dark-m-white;
-        }
-      }
-
-      .resourcefilters {
-        .MuiFormLabel-root {
-          color: rgba(232, 230, 227, .54);
-        }
-
-        .MuiInputBase-root {
-          color: rgba(232, 230, 227, .87);
-        }
-
-        .MuiSelect-icon {
-          color: $dark-m-white;
-        }
-
-        .MuiOutlinedInput-notchedOutline {
-          border-color: $dark-m-white;
-        }
-
-        .button {
-          &.is-purple {
-            background-color: rgba(31, 25, 158, .13);
-            background-image: none;
-            color: $dark-m-purple;
-          }
-        }
-
-        div {
-          .MuiFormControl-root {
-            &:nth-child(1) {
-              .MuiOutlinedInput-root {
-                border-color: #dbd3d3;
-                border-width: 25px !important;
-                position: relative;
-              }
-            }
-          }
-        }
-
-        .MuiSelect-select {
-          &:not([multiple]) {
-            option,
-            optgroup {
-              background-color: $dark-m-gray;
-            }
-          }
-        }
-      }
-
-      .misclinkscontainer {
-        .button {
-          &.is-purple {
-            background-color: rgba(31, 25, 158, .13);
-            background-image: none;
-            color: $dark-m-purple;
-          }
-        }
-      }
-    }
-
-    input {
-      .MuiInputBase-input {
-        color: $dark-m-white;
-      }
-    }
-
-    .searchbar {
-      .MuiFormLabel-root {
-        color: rgba(232, 230, 227, .54);
-      }
-
-      .MuiOutlinedInput-notchedOutline {
-        border-color: $dark-m-white;
-      }
-
-      .MuiSvgIcon-root {
-        fill: $white;
-      }
-    }
-
-    table {
-      thead {
-        color: rgb(210, 207, 200);
-      }
-    }
-
-    .tableandcontrols {
-      a {
-        color: $dark-m-blue;
-      }
-    }
-  }
-
-  .PatientsDB {
+  .Demographics {
     .filters {
       background: #1e1e30 !important;
-      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .12), inset 0 -1px 0 0 #1e1e30;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.12), inset 0 -1px 0 0 #1e1e30;
     }
 
     .legend {
@@ -5709,9 +5149,9 @@ footer {
     }
   }
 
-  .Clusters {
-    canvas {
-      filter: invert(1) hue-rotate(180deg) saturate(5);
+  .StateDropdown {
+    .dropdown {
+      background: #1e1e30 !important;
     }
   }
 }
@@ -5719,7 +5159,7 @@ footer {
 // Animation Support
 
 .fadeInUp {
-  animation-duration: .45s;
+  animation-duration: 0.45s;
   animation-fill-mode: both;
   animation-name: fadeInUp;
 }
@@ -5737,7 +5177,7 @@ footer {
 }
 
 .rotateDownRight {
-  animation-duration: .25s;
+  animation-duration: 0.25s;
   animation-fill-mode: both;
   animation-name: rotateDownRight;
 }
@@ -5749,7 +5189,7 @@ footer {
 }
 
 .rotateRightDown {
-  animation-duration: .25s;
+  animation-duration: 0.25s;
   animation-fill-mode: both;
   animation-name: rotateRightDown;
 }
@@ -5761,7 +5201,7 @@ footer {
 }
 
 .fadeOutDown {
-  animation-duration: .45s;
+  animation-duration: 0.45s;
   animation-fill-mode: both;
   animation-name: fadeOutDown;
 }
